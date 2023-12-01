@@ -64,18 +64,18 @@ public class Sudoku
         return square;
     }
 
-    private bool RowValid(int[] row)
+    private bool ArrayValid(int[] array)
     {
         for (int i = 0; i < 9; i++)
         {
-            if (!(row[i] > 0 && row[i] < 10)){
+            if (!(array[i] > 0 && array[i] < 10)){
                 return false;
             }
 
             // Check for duplicates
             for (int j = i + 1; j < 9; j++)
             {
-                if (row[i] == row[j])
+                if (array[i] == array[j])
                 {
                     return false;
                 }
@@ -89,7 +89,7 @@ public class Sudoku
         // Check rows
         for (int i = 0; i < 9; i++)
         {
-            if (!RowValid(GetRow(i)))
+            if (!ArrayValid(GetRow(i)))
             {
                 return false;
             }
@@ -98,7 +98,16 @@ public class Sudoku
         // Check columns
         for (int i = 0; i < 9; i++)
         {
-            if (!RowValid(GetColumn(i)))
+            if (!ArrayValid(GetColumn(i)))
+            {
+                return false;
+            }
+        }
+
+        // Check squares
+        for (int i = 0; i < 9; i++)
+        {
+            if (!ArrayValid(GetSquare(i)))
             {
                 return false;
             }
