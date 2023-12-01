@@ -37,6 +37,49 @@ public class Sudoku
         return _grid[index];
     }
 
+    private bool RowValid(int[] row)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            if !(row[i] > 0 && row[i] < 10){
+                return false;
+            }
+
+            // Check for duplicates
+            for (int j = i + 1; j < 9; j++)
+            {
+                if (row[i] == row[j])
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public bool Valid()
+    {
+        // Check rows
+        for (int i = 0; i < 9; i++)
+        {
+            if (!RowValid(GetRow(i)))
+            {
+                return false;
+            }
+        }
+
+        // Check columns
+        for (int i = 0; i < 9; i++)
+        {
+            if (!RowValid(GetColumn(i)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public void Print()
     {
         for (int i = 0; i < 9; i++)
