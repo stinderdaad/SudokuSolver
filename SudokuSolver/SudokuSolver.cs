@@ -1,4 +1,4 @@
-
+namespace SudokuSolver;
 using System;
 
 public class SudokuSolver
