@@ -17,6 +17,12 @@ public class Sudoku
         // }
     }
 
+    // constructor om een nieuw Sudoku object te maken van een bestaande Sudoku
+    public Sudoku(Sudoku sudoku)
+    {
+        this._grid = (int[,])sudoku._grid.Clone();
+    }
+
     // public int[,] GetGrid()
     // {
     //     return _grid;
@@ -62,6 +68,21 @@ public class Sudoku
             }
         }
         return square;
+    }
+
+    public void PutSquare(int[] square, int index)
+    {
+        int x = (index / 3) * 3;
+        int y = (index % 3) * 3;
+        int i = 0;
+        for (int j = x; j < x + 3; j++)
+        {
+            for (int k = y; k < y + 3; k++)
+            {
+                _grid[j, k] = square[i];
+                i++;
+            }
+        }
     }
 
     private bool ArrayValid(int[] array)
