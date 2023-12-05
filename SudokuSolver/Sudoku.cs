@@ -50,8 +50,8 @@ public class Sudoku
     public int[] GetSquare(int index)
     {
         int[] square = new int[9];
-        int x = (index % 3) * 3;
-        int y = (index / 3) * 3;
+        int x = (index / 3) * 3;
+        int y = (index % 3) * 3;
         int i = 0;
         for (int j = x; j < x + 3; j++)
         {
@@ -105,6 +105,7 @@ public class Sudoku
         }
 
         // Check squares
+        // Squares zijn per definitie goed, dus hoeft niet gecheckt
         for (int i = 0; i < 9; i++)
         {
             if (!ArrayValid(GetSquare(i)))
@@ -128,7 +129,7 @@ public class Sudoku
             Console.WriteLine();
             for (int k = 0; k < 9; k++)
             {
-                Console.Write("--");
+                Console.Write("----");
             }
             Console.WriteLine();
         }
