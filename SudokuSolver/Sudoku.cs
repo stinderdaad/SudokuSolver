@@ -4,6 +4,9 @@ public class Sudoku
 {
     // list of rows
     private int[,] _grid = new int[9, 9];
+    private (int[] rows, int[] columns) evaluation = (new int[9], new int[9]);
+
+    public int EvaluationResult { get => evaluation.rows.Sum() + evaluation.columns.Sum(); }
 
     public Sudoku(int[,] input)
     {
@@ -138,6 +141,36 @@ public class Sudoku
         return true;
     }
 
+    private void EvaluateRow(int row)
+    {
+        for (int i = 1; i < 10; i++)
+        {
+            if (!GetRow(row).Contains(i))
+            {
+                evaluation.rows[row]++;
+            }
+        }
+    }
+
+    private void EvaluateColumn(int col)
+    {
+        for (int i = 1; i < 10; i++)
+        {
+            if (!GetColumn(col).Contains(i))
+            {
+                evaluation.columns[col]++;
+            }
+        }
+    }
+
+    public void EvaluateGrid()
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            EvaluateRow(i);
+            EvaluateColumn(i);
+        }
+    }
 
     public static int[] Swap(int[] square, int a, int b)
     {
