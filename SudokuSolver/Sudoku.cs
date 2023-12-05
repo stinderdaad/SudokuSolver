@@ -138,6 +138,13 @@ public class Sudoku
         return true;
     }
 
+
+    public static int[] Swap(int[] square, int a, int b)
+    {
+        (square[a], square[b]) = (square[b], square[a]);
+        return square;
+    }
+
     public void Print()
     {
         for (int i = 0; i < 9; i++)

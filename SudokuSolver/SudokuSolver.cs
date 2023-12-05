@@ -52,5 +52,23 @@ public class SudokuSolver
             }
         }
         var sudoku = new Sudoku(inputSudoku);
+
+    public static List<Sudoku> GenerateNeighbours(Sudoku sudoku)
+    {
+        List<Sudoku> neighbours = [];
+        int randomNumber = 0; // TODO: make this a random number 0-8
+        for(int i = 0; i < 9; i++)
+        {
+            for (int j = i+1; j < 9; j++)
+            {
+                Sudoku neighbour = new(sudoku);
+                int[] square = neighbour.GetSquare(randomNumber);
+                Sudoku.Swap(square, i, j); // TODO hier nog een check of een getal fixed is of niet 
+                neighbour.PutSquare(square, randomNumber);
+                // TODO hier nog een check of deze state al is geweest
+                neighbours.Add(neighbour);
+            }
+        }
+        return neighbours;
     }
 }
