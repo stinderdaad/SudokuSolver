@@ -43,8 +43,9 @@ public class SudokuSolver
 
     public static List<Sudoku> GenerateNeighbours(Sudoku sudoku)
     {
-        List<Sudoku> neighbours = [];
-        int randomNumber = 0; // TODO: make this a random number 0-8
+        var rnd = new Random();
+        List<Sudoku> neighbours = new List<Sudoku>();
+        int randomNumber = rnd.Next(0,8);
         for(int i = 0; i < 9; i++)
         {
             for (int j = i+1; j < 9; j++)
