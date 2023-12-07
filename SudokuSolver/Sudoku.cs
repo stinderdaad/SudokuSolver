@@ -33,11 +33,6 @@ public class Sudoku
         this._grid = ((int, bool)[,])sudoku._grid.Clone();
     }
 
-    // public int[,] GetGrid()
-    // {
-    //     return _grid;
-    // }
-
     public (int, bool)[] GetRow(int index)
     {
         (int, bool)[] row = new (int, bool)[9];
@@ -103,59 +98,6 @@ public class Sudoku
             }
         }
     }
-
-    // private bool ArrayValid(int[] array)
-    // {
-    //     for (int i = 0; i < 9; i++)
-    //     {
-    //         if (!(array[i] > 0 && array[i] < 10)){
-    //             return false;
-    //         }
-
-    //         // Check for duplicates
-    //         for (int j = i + 1; j < 9; j++)
-    //         {
-    //             if (array[i] == array[j])
-    //             {
-    //                 return false;
-    //             }
-    //         }
-    //     }
-    //     return true;
-    // }
-
-    // public bool Valid()
-    // {
-    //     // Check rows
-    //     for (int i = 0; i < 9; i++)
-    //     {
-    //         if (!ArrayValid(GetRow(i)))
-    //         {
-    //             return false;
-    //         }
-    //     }
-
-    //     // Check columns
-    //     for (int i = 0; i < 9; i++)
-    //     {
-    //         if (!ArrayValid(GetColumn(i)))
-    //         {
-    //             return false;
-    //         }
-    //     }
-
-    //     // Check squares
-    //     // Squares zijn per definitie goed, dus hoeft niet gecheckt
-    //     for (int i = 0; i < 9; i++)
-    //     {
-    //         if (!ArrayValid(GetSquare(i)))
-    //         {
-    //             return false;
-    //         }
-    //     }
-
-    //     return true;
-    // }
 
     private void EvaluateRow(int row)
     {
