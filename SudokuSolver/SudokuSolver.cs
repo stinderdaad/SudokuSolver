@@ -20,7 +20,7 @@ public class SudokuSolver
         return inputArray;
     }
 
-    public static int[,] PopulateArray() { 
+    public static int[,] PopulateArray() {
         // Populate the sudoku grid (input is assumed as row-wise so numbers 1-9 are in the first row,
         // 10-18 in the second etc.)
         var inputArray = GetInput();
@@ -51,8 +51,8 @@ public class SudokuSolver
             for (int j = i+1; j < 9; j++)
             {
                 Sudoku neighbour = new(sudoku);
-                int[] square = neighbour.GetSquare(randomNumber);
-                Sudoku.Swap(square, i, j); // TODO hier nog een check of een getal fixed is of niet 
+                (int, bool)[] square = neighbour.GetSquare(randomNumber);
+                Sudoku.Swap(square, i, j); // TODO hier nog een check of een getal fixed is of niet
                 neighbour.PutSquare(square, randomNumber);
                 // TODO hier nog een check of deze state al is geweest
                 neighbours.Add(neighbour);

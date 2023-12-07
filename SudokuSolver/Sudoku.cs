@@ -188,10 +188,19 @@ public class Sudoku
         }
     }
 
-    public static int[] Swap(int[] square, int a, int b)
+    public static (int, bool)[] Swap((int, bool)[] square, int a, int b)
     {
-        (square[a], square[b]) = (square[b], square[a]);
-        return square;
+        (int value1, bool fixed1) = square[a];
+        (int value2, bool fixed2) = square[b];
+        if (fixed1 || fixed2)
+        {
+            return square;
+        }
+        else
+        {
+            (square[a], square[b]) = (square[b], square[a]);
+            return square;
+        }
     }
 
     public void Print()
