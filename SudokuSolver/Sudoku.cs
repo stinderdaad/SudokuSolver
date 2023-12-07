@@ -33,6 +33,29 @@ public class Sudoku
         this._grid = ((int, bool)[,])sudoku._grid.Clone();
     }
 
+    // Fills each 0 in each square with an unused number 1-9 randomly
+    public void InitState()
+    {
+        var rnd = new Random();
+        for (int i = 0; i < 9; i++)
+        {
+            (int, bool)[] square = GetSquare(i);
+            for (int j = 0; j < 9; j++)
+            {
+                if (square[j].Item1 == 0)
+                {
+                    int randomNumber = rnd.Next(1, 10);
+                    while (ValuesFrom(square).Contains(randomNumber))
+                    {
+                        randomNumber = rnd.Next(1, 10);
+                    }
+                    square[j].Item1 = randomNumber;
+                }
+            }
+            PutSquare(square, i);
+        }
+    }
+
     public (int, bool)[] GetRow(int index)
     {
         (int, bool)[] row = new (int, bool)[9];
