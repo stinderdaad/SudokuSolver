@@ -147,19 +147,22 @@ public class Sudoku
 
     public void Print()
     {
+        Console.WriteLine("-------------------------------");
         for (int i = 0; i < 9; i++)
         {
-            Console.Write("| ");
             for (int j = 0; j < 9; j++)
             {
-                Console.Write(_grid[i, j] + " | ");
+                if (j % 3 == 0)
+                {
+                    Console.Write("|");
+                }
+                Console.Write(" " + _grid[i, j].Item1 + " ");
             }
-            Console.WriteLine();
-            for (int k = 0; k < 9; k++)
+            Console.WriteLine("|");
+            if (i % 3 == 2)
             {
-                Console.Write("----");
+                Console.WriteLine("-------------------------------");
             }
-            Console.WriteLine();
         }
     }
 }

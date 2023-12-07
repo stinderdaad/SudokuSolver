@@ -18,12 +18,7 @@ public class Program
         //     { 2, 3, 9, 5, 1, 6, 8, 4, 7 }
         // };
         // Sudoku sudoku = new Sudoku(input);
-        // int[] row = sudoku.GetRow(0);
-        // int[] column = sudoku.GetColumn(0);
-        // int[] square = sudoku.GetSquare(0);
-        // Console.WriteLine("Row 0: " + string.Join(", ", row));
-        // Console.WriteLine("Column 0: " + string.Join(", ", column));
-        // Console.WriteLine("Square 0: " + string.Join(", ", square));
+        // sudoku.Print();
 
         var sudoku = new Sudoku(SudokuSolver.PopulateArray());
         Console.WriteLine("Sudoku:");
