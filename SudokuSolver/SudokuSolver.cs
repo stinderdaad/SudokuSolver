@@ -3,10 +3,6 @@ using System;
 
 public class SudokuSolver
 {
-    public SudokuSolver()
-    {
-    }
-
     public static string[] GetInput()
     {
         Console.WriteLine(
@@ -44,14 +40,14 @@ public class SudokuSolver
     public static List<Sudoku> GenerateNeighbours(Sudoku sudoku)
     {
         var rnd = new Random();
-        List<Sudoku> neighbours = new List<Sudoku>();
-        int randomNumber = rnd.Next(0,9);
-        for(int i = 0; i < 9; i++)
+        var neighbours = new List<Sudoku>();
+        var randomNumber = rnd.Next(0,9);
+        for(var i = 0; i < 9; i++)
         {
-            for (int j = i+1; j < 9; j++)
+            for (var j = i+1; j < 9; j++)
             {
                 Sudoku neighbour = new(sudoku);
-                (int, bool)[] square = neighbour.GetSquare(randomNumber);
+                var square = neighbour.GetSquare(randomNumber);
                 Sudoku.Swap(square, i, j); // TODO hier nog een check of een getal fixed is of niet
                 neighbour.PutSquare(square, randomNumber);
                 // TODO hier nog een check of deze state al is geweest

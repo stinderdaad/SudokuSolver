@@ -5,7 +5,7 @@ public class Program
 {
     public static void Main()
     {
-        // int[,] input = new int[9, 9]
+        // var input = new int[9, 9]
         // {
         //     { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
         //     { 9, 8, 7, 6, 5, 4, 3, 2, 1 },
@@ -17,10 +17,10 @@ public class Program
         //     { 5, 7, 1, 3, 4, 8, 2, 6, 9 },
         //     { 2, 3, 9, 5, 1, 6, 8, 4, 7 }
         // };
-        // Sudoku sudoku = new Sudoku(input);
+        // var sudoku = new Sudoku(input);
         // sudoku.Print();
 
-        // int[,] input = new int[9, 9]
+        // var input = new int[9, 9]
         // {
         //     { 0, 2, 3, 0, 0, 6, 7, 0, 9 },
         //     { 9, 0, 0, 6, 5, 4, 3, 0, 1 },
@@ -32,7 +32,7 @@ public class Program
         //     { 5, 0, 0, 0, 4, 0, 2, 0, 9 },
         //     { 2, 3, 9, 5, 1, 6, 0, 4, 7 }
         // };
-        // Sudoku sudoku = new Sudoku(input);
+        // var sudoku = new Sudoku(input);
         // sudoku.Print();
         // Console.WriteLine(" Init: ");
         // sudoku.InitState();
