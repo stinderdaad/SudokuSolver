@@ -37,20 +37,19 @@ public class Sudoku
     public void InitState()
     {
         var rnd = new Random();
-        for (int i = 0; i < 9; i++)
+        for (var i = 0; i < 9; i++)
         {
-            (int, bool)[] square = GetSquare(i);
-            for (int j = 0; j < 9; j++)
+            var square = GetSquare(i);
+            var presentNumbers = square.Select(item => item.Item1).Where(val => val != 0).ToList();
+            var missingNumbers = Enumerable.Range(1, 9).Except(presentNumbers).ToList();
+            
+            for (var j = 0; j < 9; j++)
             {
-                if (square[j].Item1 == 0)
-                {
-                    int randomNumber = rnd.Next(1, 10);
-                    while (ValuesFrom(square).Contains(randomNumber))
-                    {
-                        randomNumber = rnd.Next(1, 10);
-                    }
-                    square[j].Item1 = randomNumber;
-                }
+                var curr = square[j].Item1;
+                if (curr != 0) continue;
+                var rndIndex = rnd.Next(0, missingNumbers.Count);
+                square[j].Item1 = missingNumbers[rndIndex];
+                missingNumbers.RemoveAt(rndIndex);
             }
             PutSquare(square, i);
         }
