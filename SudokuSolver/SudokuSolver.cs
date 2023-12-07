@@ -45,7 +45,7 @@ public class SudokuSolver
     {
         var rnd = new Random();
         List<Sudoku> neighbours = new List<Sudoku>();
-        int randomNumber = rnd.Next(0,8);
+        int randomNumber = rnd.Next(0,9);
         for(int i = 0; i < 9; i++)
         {
             for (int j = i+1; j < 9; j++)
