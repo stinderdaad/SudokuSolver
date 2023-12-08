@@ -127,9 +127,11 @@ public class Sudoku
 
     private void EvaluateRow(int row)
     {
+        _evaluation.rows[row] = 0;
+        var rowValues = ValuesFrom(GetRow(row));
         for (var i = 1; i < 10; i++)
         {
-            if (!ValuesFrom(GetRow(row)).Contains(i))
+            if (!rowValues.Contains(i))
             {
                 _evaluation.rows[row]++;
             }
@@ -138,9 +140,11 @@ public class Sudoku
 
     private void EvaluateColumn(int col)
     {
+        _evaluation.columns[col] = 0;
+        var colValues = ValuesFrom(GetColumn(col));
         for (var i = 1; i < 10; i++)
         {
-            if (!ValuesFrom(GetColumn(col)).Contains(i))
+            if (!colValues.Contains(i))
             {
                 _evaluation.columns[col]++;
             }
@@ -175,7 +179,7 @@ public class Sudoku
                 }
                 Console.Write(" " + _grid[i, j].Number + " ");
             }
-            Console.WriteLine("|");
+            Console.WriteLine($"|{i}: {_evaluation.rows[i]}");
             if (i % 3 == 2)
             {
                 Console.WriteLine("-------------------------------");
