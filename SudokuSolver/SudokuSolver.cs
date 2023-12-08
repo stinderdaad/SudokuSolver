@@ -49,7 +49,7 @@ public class SudokuSolver
         return sudoku;
     }
 
-    public static List<Sudoku> GenerateNeighbours(Sudoku sudoku)
+    public List<Sudoku> GenerateNeighbours(Sudoku sudoku)
     {
         var neighbours = new List<Sudoku>();
         var rnd = new Random();
@@ -65,7 +65,9 @@ public class SudokuSolver
 
                 Sudoku.Swap(square, i, j);
                 neighbour.PutSquare(square, randomNumber);
-                // TODO hier nog een check of deze state al is geweest
+                if (visitedStates.Contains(neighbour)) 
+                { continue; } 
+                
                 neighbours.Add(neighbour);
             }
         }
@@ -75,12 +77,15 @@ public class SudokuSolver
     // returns new sudoku with lowest score, and true if it is different than the previous sudoku, false if it is the same
     public static (Sudoku, bool) ChooseNext(Sudoku current, List<Sudoku> input)
     {
-        var lowestScore = int.MaxValue;
+        var lowestScore = current.EvaluationResult;
         var result = new Sudoku(current);
         foreach(var sudoku in input)
         {
             if (sudoku.EvaluationResult < lowestScore)
+            {
                 result = sudoku;
+                lowestScore = sudoku.EvaluationResult;
+            }
         }
         return (result, result != current);
     }
