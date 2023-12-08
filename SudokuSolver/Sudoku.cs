@@ -178,13 +178,31 @@ public class Sudoku
                 {
                     Console.Write("|");
                 }
+                if (_grid[i, j].IsFixed)
+                    Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write(" " + _grid[i, j].Number + " ");
+                Console.ResetColor();
             }
+
+            // evaluation score per row
             Console.WriteLine($"|{i}: {_evaluation.rows[i]}");
+
             if (i % 3 == 2)
             {
                 Console.WriteLine("-------------------------------");
             }
         }
+
+        // evaluation score per column
+        Console.Write("|");
+        for (var i = 0; i < 9; i++)
+        {
+            Console.Write($" {_evaluation.columns[i]} ");
+            if ((i+1) % 3 == 0)
+            {
+                Console.Write("|");
+            }
+        }
+        Console.Write("\n");
     }
 }
