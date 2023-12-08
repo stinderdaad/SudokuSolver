@@ -4,7 +4,44 @@ public record struct SudokuResult(Sudoku Sudoku, bool Improved);
 
 public class IteratedLocalSearch
 {
-    public List<Sudoku> GenerateNeighbours(Sudoku sudoku, HashSet<Sudoku> visitedStates)
+    public static Sudoku Solve(Sudoku inputSudoku, HashSet<Sudoku> visitedStates)
+    {
+        var b = true;
+        var result = new SudokuResult(inputSudoku, true);
+        
+        // loops while result improves and solution is not yet found
+        while (b && result.Sudoku.EvaluationResult != 0)
+        {
+            _ = Console.ReadLine();
+            result = Step(inputSudoku, visitedStates);
+            b = result.Improved;
+            Console.WriteLine($"Improved: {b}");
+            Console.WriteLine($"New Sudoku score: {result.Sudoku.EvaluationResult}");
+            result.Sudoku.Print();
+
+        }
+        
+        // if loop finishes, then either solution is found, or no improvement possible
+        if (result.Sudoku.EvaluationResult == 0)
+        {
+            return result.Sudoku;
+        }
+        else
+        {
+            result.Sudoku = RandomWalk(result.Sudoku, 10);
+            result.Sudoku = Solve(result.Sudoku, visitedStates);
+            return result.Sudoku; // recursion
+        }
+    }
+
+    private static SudokuResult Step(Sudoku inputSudoku, HashSet<Sudoku> visitedStates)
+    {
+        var neighbours = GenerateNeighbours(inputSudoku, visitedStates);
+        var bestNeighbour = ChooseNext(inputSudoku, neighbours);
+        return bestNeighbour;
+    }
+
+    public static List<Sudoku> GenerateNeighbours(Sudoku sudoku, HashSet<Sudoku> visitedStates)
     {
         var neighbours = new List<Sudoku>();
         var rnd = new Random();
@@ -14,15 +51,15 @@ public class IteratedLocalSearch
             for (var j = i + 1; j < 9; j++)
             {
                 Sudoku neighbour = new(sudoku);
-                var square = neighbour.GetSquare(randomNumber);
-                if (square[i].isFixed || square[j].isFixed)
+                var square = sudoku.GetSquare(randomNumber);
+                if (square[i].IsFixed || square[j].IsFixed)
                 { continue; }
 
                 Sudoku.Swap(square, i, j);
                 neighbour.PutSquare(square, randomNumber);
                 if (visitedStates.Contains(neighbour))
                 { continue; }
-
+                Console.WriteLine($"Swapped: square {randomNumber} number {i} and {j}");
                 neighbours.Add(neighbour);
             }
         }
@@ -30,7 +67,7 @@ public class IteratedLocalSearch
     }
 
     // returns new sudoku with lowest score, and true if it is different than the previous sudoku, false if it is the same
-    public static (Sudoku, bool) ChooseNext(Sudoku current, List<Sudoku> input)
+    public static SudokuResult ChooseNext(Sudoku current, List<Sudoku> input)
     {
         var lowestScore = current.EvaluationResult;
         var result = new Sudoku(current);
@@ -42,11 +79,11 @@ public class IteratedLocalSearch
                 lowestScore = sudoku.EvaluationResult;
             }
         }
-        return (result, result != current);
+        return new SudokuResult(result, result != current);
     }
 
     // returns a sudoku with distance amount of random swaps
-    public Sudoku RandomWalk(Sudoku sudoku, int distance)
+    public static Sudoku RandomWalk(Sudoku sudoku, int distance)
     {
         var rnd = new Random();
         var distanceLeft = distance;
@@ -56,7 +93,7 @@ public class IteratedLocalSearch
             var square = sudoku.GetSquare(randomSquare);
             var a = rnd.Next(0, 9);
             var b = rnd.Next(0, 9);
-            if (square[a].isFixed || square[b].isFixed)
+            if (square[a].IsFixed || square[b].IsFixed)
             { continue; }
 
             Sudoku.Swap(square, a, b);

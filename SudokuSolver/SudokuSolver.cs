@@ -52,6 +52,7 @@ public class SudokuSolver
     public Sudoku Solve(Sudoku inputSudoku)
     {
         var result = IteratedLocalSearch.DoIteratedLocalSearch(inputSudoku, visitedStates);
+        var result = IteratedLocalSearch.Solve(inputSudoku, visitedStates);
         return result;
     }
 }

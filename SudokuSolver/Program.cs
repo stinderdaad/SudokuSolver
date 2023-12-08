@@ -59,12 +59,10 @@ public class Program
         // sudoku.InitState();
         // sudoku.Print();
 
-        // var solver = new SudokuSolver();
-        // var inputArray = SudokuSolver.GetInput();
-        // var sudoku = solver.BuildSudoku(inputArray);
-        // Console.WriteLine("Sudoku:");
-        // sudoku.Print();
-        // sudoku.EvaluateGrid();
-        // Console.WriteLine($"Evaluation function: {sudoku.EvaluationResult}");
+        var solver = new SudokuSolver();
+        var inputArray = SudokuSolver.GetInput();
+        var sudoku = solver.BuildSudoku(inputArray);
+        Console.WriteLine("Sudoku:");
+        sudoku.Print();
     }
 }
