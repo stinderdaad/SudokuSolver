@@ -3,6 +3,10 @@ using System;
 
 public class SudokuSolver
 {
+    HashSet<Sudoku> visitedStates = [];
+
+    public SudokuSolver() { }
+
     public static string[] GetInput()
     {
         Console.WriteLine(
@@ -16,10 +20,9 @@ public class SudokuSolver
         return inputArray;
     }
 
-    public static int[,] PopulateArray() {
+    private static int[,] PopulateArray(string[] inputArray) {
         // Populate the sudoku grid (input is assumed as row-wise so numbers 1-9 are in the first row,
         // 10-18 in the second etc.)
-        var inputArray = GetInput();
         var inputSudoku = new int[9, 9];
         var index = 0;
         for (var i = 0; i < 9; i++)
@@ -37,10 +40,19 @@ public class SudokuSolver
         return inputSudoku;
     }
 
+    public Sudoku BuildSudoku(string[] inputArray)
+    {
+        var sudoku = new Sudoku(PopulateArray(inputArray));
+        sudoku.InitState();
+        sudoku.EvaluateGrid();
+        visitedStates.Add(sudoku);
+        return sudoku;
+    }
+
     public static List<Sudoku> GenerateNeighbours(Sudoku sudoku)
     {
-        var rnd = new Random();
         var neighbours = new List<Sudoku>();
+        var rnd = new Random();
         var randomNumber = rnd.Next(0,9);
         for(var i = 0; i < 9; i++)
         {
@@ -48,12 +60,28 @@ public class SudokuSolver
             {
                 Sudoku neighbour = new(sudoku);
                 var square = neighbour.GetSquare(randomNumber);
-                Sudoku.Swap(square, i, j); // TODO hier nog een check of een getal fixed is of niet
+                if (square[i].isFixed || square[j].isFixed)
+                { continue; }
+
+                Sudoku.Swap(square, i, j);
                 neighbour.PutSquare(square, randomNumber);
                 // TODO hier nog een check of deze state al is geweest
                 neighbours.Add(neighbour);
             }
         }
         return neighbours;
+    }
+
+    // returns new sudoku with lowest score, and true if it is different than the previous sudoku, false if it is the same
+    public static (Sudoku, bool) ChooseNext(Sudoku current, List<Sudoku> input)
+    {
+        var lowestScore = int.MaxValue;
+        var result = new Sudoku(current);
+        foreach(var sudoku in input)
+        {
+            if (sudoku.EvaluationResult < lowestScore)
+                result = sudoku;
+        }
+        return (result, result != current);
     }
 }

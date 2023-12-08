@@ -3,7 +3,7 @@ namespace SudokuSolver;
 public class Sudoku
 {
     // list of rows. Tuple contains (value, fixed).
-    private readonly (int, bool)[,] _grid = new (int, bool)[9, 9];
+    private readonly (int number, bool isFixed)[,] _grid = new (int, bool)[9, 9];
     private readonly (int[] rows, int[] columns) _evaluation = (new int[9], new int[9]);
 
     public int EvaluationResult => _evaluation.rows.Sum() + _evaluation.columns.Sum();
@@ -40,15 +40,15 @@ public class Sudoku
         for (var i = 0; i < 9; i++)
         {
             var square = GetSquare(i);
-            var presentNumbers = square.Select(item => item.Item1).Where(val => val != 0).ToList();
+            var presentNumbers = square.Select(item => item.number).Where(val => val != 0).ToList();
             var missingNumbers = Enumerable.Range(1, 9).Except(presentNumbers).ToList();
             
             for (var j = 0; j < 9; j++)
             {
-                var curr = square[j].Item1;
+                var curr = square[j].number;
                 if (curr != 0) continue;
                 var rndIndex = rnd.Next(0, missingNumbers.Count);
-                square[j].Item1 = missingNumbers[rndIndex];
+                square[j].number = missingNumbers[rndIndex];
                 missingNumbers.RemoveAt(rndIndex);
             }
             PutSquare(square, i);
@@ -89,7 +89,7 @@ public class Sudoku
     // 0 1 2
     // 3 4 5
     // 6 7 8
-    public (int, bool)[] GetSquare(int index)
+    public (int number, bool isFixed)[] GetSquare(int index)
     {
         var square = new (int, bool)[9];
         var x = (index / 3) * 3;
@@ -106,6 +106,7 @@ public class Sudoku
         return square;
     }
 
+    // puts an input square into the grid, then updates the evaluation function
     public void PutSquare((int, bool)[] square, int index)
     {
         var x = (index / 3) * 3;
@@ -119,6 +120,7 @@ public class Sudoku
                 i++;
             }
         }
+        EvaluateGrid();
     }
 
     private void EvaluateRow(int row)
@@ -154,13 +156,6 @@ public class Sudoku
 
     public static (int, bool)[] Swap((int, bool)[] square, int a, int b)
     {
-        var (_, fixed1) = square[a];
-        var (_, fixed2) = square[b];
-        if (fixed1 || fixed2)
-        {
-            return square;
-        }
-
         (square[a], square[b]) = (square[b], square[a]);
         return square;
     }
@@ -176,7 +171,7 @@ public class Sudoku
                 {
                     Console.Write("|");
                 }
-                Console.Write(" " + _grid[i, j].Item1 + " ");
+                Console.Write(" " + _grid[i, j].number + " ");
             }
             Console.WriteLine("|");
             if (i % 3 == 2)

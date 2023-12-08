@@ -37,8 +37,9 @@ public class Program
         // Console.WriteLine(" Init: ");
         // sudoku.InitState();
         // sudoku.Print();
-
-        var sudoku = new Sudoku(SudokuSolver.PopulateArray());
+        var solver = new SudokuSolver();
+        var inputArray = SudokuSolver.GetInput();
+        var sudoku = solver.BuildSudoku(inputArray);
         Console.WriteLine("Sudoku:");
         sudoku.Print();
         sudoku.EvaluateGrid();
