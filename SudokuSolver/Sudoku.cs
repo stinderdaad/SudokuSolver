@@ -1,9 +1,11 @@
 namespace SudokuSolver;
 
+public record struct SudokuItem(int Number, bool IsFixed);
+
 public class Sudoku
 {
     // list of rows. Tuple contains (value, fixed).
-    private readonly (int number, bool isFixed)[,] _grid = new (int, bool)[9, 9];
+    private readonly SudokuItem[,] _grid = new SudokuItem[9, 9];
     private readonly (int[] rows, int[] columns) _evaluation = (new int[9], new int[9]);
 
     public int EvaluationResult => _evaluation.rows.Sum() + _evaluation.columns.Sum();
@@ -17,11 +19,11 @@ public class Sudoku
                 var value = input[i, j];
                 if (value == 0)
                 {
-                    _grid[i, j] = (value, false);
+                    _grid[i, j] = new SudokuItem(value, false);
                 }
                 else
                 {
-                    _grid[i, j] = (value, true);
+                    _grid[i, j] = new SudokuItem(value, true);
                 }
             }
         }
@@ -30,7 +32,7 @@ public class Sudoku
     // constructor om een nieuw Sudoku object te maken van een bestaande Sudoku
     public Sudoku(Sudoku sudoku)
     {
-        _grid = ((int, bool)[,])sudoku._grid.Clone();
+        _grid = (SudokuItem[,])sudoku._grid.Clone();
     }
 
     // Fills each 0 in each square with an unused number 1-9 randomly
@@ -40,24 +42,24 @@ public class Sudoku
         for (var i = 0; i < 9; i++)
         {
             var square = GetSquare(i);
-            var presentNumbers = square.Select(item => item.number).Where(val => val != 0).ToList();
+            var presentNumbers = square.Select(item => item.Number).Where(val => val != 0).ToList();
             var missingNumbers = Enumerable.Range(1, 9).Except(presentNumbers).ToList();
             
             for (var j = 0; j < 9; j++)
             {
-                var curr = square[j].number;
+                var curr = square[j].Number;
                 if (curr != 0) continue;
                 var rndIndex = rnd.Next(0, missingNumbers.Count);
-                square[j].number = missingNumbers[rndIndex];
+                square[j].Number = missingNumbers[rndIndex];
                 missingNumbers.RemoveAt(rndIndex);
             }
             PutSquare(square, i);
         }
     }
 
-    public (int, bool)[] GetRow(int index)
+    public SudokuItem[] GetRow(int index)
     {
-        var row = new (int, bool)[9];
+        var row = new SudokuItem[9];
         for (var i = 0; i < 9; i++)
         {
             row[i] = _grid[index, i];
@@ -65,9 +67,9 @@ public class Sudoku
         return row;
     }
 
-    public (int, bool)[] GetColumn(int index)
+    public SudokuItem[] GetColumn(int index)
     {
-        var column = new (int, bool)[9];
+        var column = new SudokuItem[9];
         for (var i = 0; i < 9; i++)
         {
             column[i] = _grid[i, index];
@@ -75,12 +77,12 @@ public class Sudoku
         return column;
     }
 
-    private static int[] ValuesFrom((int, bool)[] array)
+    private static int[] ValuesFrom(SudokuItem[] array)
     {
         var values = new int[9];
         for (var i = 0; i < 9; i++)
         {
-            values[i] = array[i].Item1;
+            values[i] = array[i].Number;
         }
         return values;
     }
@@ -89,9 +91,9 @@ public class Sudoku
     // 0 1 2
     // 3 4 5
     // 6 7 8
-    public (int number, bool isFixed)[] GetSquare(int index)
+    public SudokuItem[] GetSquare(int index)
     {
-        var square = new (int, bool)[9];
+        var square = new SudokuItem[9];
         var x = (index / 3) * 3;
         var y = (index % 3) * 3;
         var i = 0;
@@ -107,7 +109,7 @@ public class Sudoku
     }
 
     // puts an input square into the grid, then updates the evaluation function
-    public void PutSquare((int, bool)[] square, int index)
+    public void PutSquare(SudokuItem[] square, int index)
     {
         var x = (index / 3) * 3;
         var y = (index % 3) * 3;
@@ -154,7 +156,7 @@ public class Sudoku
         }
     }
 
-    public static (int, bool)[] Swap((int, bool)[] square, int a, int b)
+    public static SudokuItem[] Swap(SudokuItem[] square, int a, int b)
     {
         (square[a], square[b]) = (square[b], square[a]);
         return square;
@@ -171,7 +173,7 @@ public class Sudoku
                 {
                     Console.Write("|");
                 }
-                Console.Write(" " + _grid[i, j].number + " ");
+                Console.Write(" " + _grid[i, j].Number + " ");
             }
             Console.WriteLine("|");
             if (i % 3 == 2)

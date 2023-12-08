@@ -1,5 +1,7 @@
 ﻿namespace SudokuSolver;
 
+public record struct SudokuResult(Sudoku Sudoku, bool Improved);
+
 public class IteratedLocalSearch
 {
     // Check if each row and column contains the distinct numbers 1-9
