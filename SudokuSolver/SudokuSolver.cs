@@ -65,9 +65,9 @@ public class SudokuSolver
 
                 Sudoku.Swap(square, i, j);
                 neighbour.PutSquare(square, randomNumber);
-                if (visitedStates.Contains(neighbour)) 
-                { continue; } 
-                
+                if (visitedStates.Contains(neighbour))
+                { continue; }
+
                 neighbours.Add(neighbour);
             }
         }
@@ -88,5 +88,26 @@ public class SudokuSolver
             }
         }
         return (result, result != current);
+    }
+
+    // returns a sudoku with distance amount of random swaps
+    public Sudoku RandomWalk(Sudoku sudoku, int distance)
+    {
+        var rnd = new Random();
+        var distanceLeft = distance;
+        while (distanceLeft > 0)
+        {
+            var randomSquare = rnd.Next(0,9);
+            var square = sudoku.GetSquare(randomSquare);
+            var a = rnd.Next(0,9);
+            var b = rnd.Next(0,9);
+            if (square[a].isFixed || square[b].isFixed)
+            { continue; }
+
+            Sudoku.Swap(square, a, b);
+            sudoku.PutSquare(square, randomSquare);
+            distanceLeft--;
+        }
+        return sudoku;
     }
 }
