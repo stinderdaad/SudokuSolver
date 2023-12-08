@@ -33,6 +33,7 @@ public class Sudoku
     public Sudoku(Sudoku sudoku)
     {
         _grid = (SudokuItem[,])sudoku._grid.Clone();
+        EvaluateGrid();
     }
 
     // Fills each 0 in each square with an unused number 1-9 randomly

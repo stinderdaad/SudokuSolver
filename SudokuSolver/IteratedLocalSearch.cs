@@ -6,19 +6,19 @@ public class IteratedLocalSearch
 {
     public static Sudoku Solve(Sudoku inputSudoku, HashSet<Sudoku> visitedStates)
     {
-        var b = true;
         var result = new SudokuResult(inputSudoku, true);
+        var counter = 0; // counter telt hoe vaak achter elkaar er géén verbetering is. Als dat te vaak gebeurt is er een random walk
         
         // loops while result improves and solution is not yet found
-        while (b && result.Sudoku.EvaluationResult != 0)
+        while (counter < 9 && result.Sudoku.EvaluationResult != 0)
         {
-            _ = Console.ReadLine();
-            result = Step(inputSudoku, visitedStates);
-            b = result.Improved;
-            Console.WriteLine($"Improved: {b}");
-            Console.WriteLine($"New Sudoku score: {result.Sudoku.EvaluationResult}");
-            result.Sudoku.Print();
+            result = Step(result.Sudoku, visitedStates);
+            if (!result.Improved) 
+            { counter++; }
+            else counter = 0;
 
+            // debugging
+            Console.WriteLine($"New Sudoku score: {result.Sudoku.EvaluationResult}");
         }
         
         // if loop finishes, then either solution is found, or no improvement possible
@@ -28,9 +28,15 @@ public class IteratedLocalSearch
         }
         else
         {
-            result.Sudoku = RandomWalk(result.Sudoku, 10);
-            result.Sudoku = Solve(result.Sudoku, visitedStates);
-            return result.Sudoku; // recursion
+            var S_Waarde = 2;
+            result.Sudoku = RandomWalk(result.Sudoku, S_Waarde);
+
+            // debugging
+            Console.WriteLine("random walk");
+            Console.WriteLine("Score after walk: " +  result.Sudoku.EvaluationResult);
+
+            result.Sudoku = Solve(result.Sudoku, visitedStates); // recursion
+            return result.Sudoku;
         }
     }
 
@@ -38,6 +44,7 @@ public class IteratedLocalSearch
     {
         var neighbours = GenerateNeighbours(inputSudoku, visitedStates);
         var bestNeighbour = ChooseNext(inputSudoku, neighbours);
+        visitedStates.Add(bestNeighbour.Sudoku);
         return bestNeighbour;
     }
 
@@ -59,7 +66,7 @@ public class IteratedLocalSearch
                 neighbour.PutSquare(square, randomNumber);
                 if (visitedStates.Contains(neighbour))
                 { continue; }
-                Console.WriteLine($"Swapped: square {randomNumber} number {i} and {j}");
+
                 neighbours.Add(neighbour);
             }
         }
@@ -73,13 +80,13 @@ public class IteratedLocalSearch
         var result = new Sudoku(current);
         foreach (var sudoku in input)
         {
-            if (sudoku.EvaluationResult < lowestScore)
+            if (sudoku.EvaluationResult <= lowestScore)
             {
                 result = sudoku;
                 lowestScore = sudoku.EvaluationResult;
             }
         }
-        return new SudokuResult(result, result != current);
+        return new SudokuResult(result, result.EvaluationResult != current.EvaluationResult);
     }
 
     // returns a sudoku with distance amount of random swaps

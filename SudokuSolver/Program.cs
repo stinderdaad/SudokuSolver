@@ -64,5 +64,9 @@ public class Program
         var sudoku = solver.BuildSudoku(inputArray);
         Console.WriteLine("Sudoku:");
         sudoku.Print();
+        Console.WriteLine($"Evaluation function: {sudoku.EvaluationResult}");
+        var solution = solver.Solve(sudoku);
+        Console.WriteLine("Solution:");
+        solution.Print();
     }
 }
