@@ -63,7 +63,7 @@ public class IteratedLocalSearch
                 { continue; }
 
                 Sudoku.Swap(square, i, j);
-                neighbour.PutSquare(square, randomNumber);
+                neighbour.PutSquare(square, randomNumber, i, j);
                 if (visitedStates.Contains(neighbour))
                 { continue; }
 
@@ -104,7 +104,7 @@ public class IteratedLocalSearch
             { continue; }
 
             Sudoku.Swap(square, a, b);
-            sudoku.PutSquare(square, randomSquare);
+            sudoku.PutSquare(square, randomSquare, a, b);
             distanceLeft--;
         }
         return sudoku;

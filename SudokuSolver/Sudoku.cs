@@ -56,6 +56,7 @@ public class Sudoku
             }
             PutSquare(square, i);
         }
+        EvaluateGrid();
     }
 
     public SudokuItem[] GetRow(int index)
@@ -110,7 +111,7 @@ public class Sudoku
     }
 
     // puts an input square into the grid, then updates the evaluation function
-    public void PutSquare(SudokuItem[] square, int index)
+    public void PutSquare(SudokuItem[] square, int index, int a = -1, int b = -1)
     {
         var x = (index / 3) * 3;
         var y = (index % 3) * 3;
@@ -123,7 +124,13 @@ public class Sudoku
                 i++;
             }
         }
-        EvaluateGrid();
+
+        // als er geen waarde aan a en b zijn gegeven, dan wordt evaluatiefunctie niet uitgevoerd
+        if (a != -1 && b != -1)
+        {
+            UpdateEvaluation(index, a, b);
+        }
+        //EvaluateGrid();
     }
 
     private void EvaluateRow(int row)
@@ -159,6 +166,20 @@ public class Sudoku
             EvaluateRow(i);
             EvaluateColumn(i);
         }
+    }
+
+    // update alleen de evaluatie voor die rijen en kolommen die veranderd zijn door de swap
+    private void UpdateEvaluation(int index, int a, int b)
+    {
+        var row1 = (index / 3) * 3 + (a / 3);
+        var row2 = (index / 3) * 3 + (b / 3);
+        var col1 = (index % 3) * 3 + (a % 3);
+        var col2 = (index % 3) * 3 + (b % 3);
+
+        EvaluateRow(row1);
+        if (row1 != row2) EvaluateRow(row2);
+        EvaluateColumn(col1);
+        if (col2 != col1) EvaluateColumn(col2);
     }
 
     public static SudokuItem[] Swap(SudokuItem[] square, int a, int b)
