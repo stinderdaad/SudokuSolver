@@ -23,7 +23,7 @@ public class Sudoku
                 }
                 else
                 {
-                    _grid[i, j] = new SudokuItem(value, false);
+                    _grid[i, j] = new SudokuItem(value, true);
                 }
             }
         }
