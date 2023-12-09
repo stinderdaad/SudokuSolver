@@ -67,6 +67,6 @@ public class Program
         Console.WriteLine($"Evaluation function: {sudoku.EvaluationResult}");
         var solution = solver.Solve(sudoku);
         Console.WriteLine("Solution:");
-        solution.Print();
+        solution.solution.Print();
     }
 }

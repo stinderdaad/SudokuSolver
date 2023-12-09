@@ -4,7 +4,7 @@ public record struct SudokuResult(Sudoku Sudoku, bool Improved);
 
 public class IteratedLocalSearch
 {
-    public static Sudoku Solve(Sudoku inputSudoku, HashSet<Sudoku> visitedStates)
+    public static (Sudoku solution, int iterationCount) Solve(Sudoku inputSudoku, HashSet<Sudoku> visitedStates, int iterationCount)
     {
         var result = new SudokuResult(inputSudoku, true);
         var counter = 0; // counter telt hoe vaak achter elkaar er géén verbetering is. Als dat te vaak gebeurt is er een random walk
@@ -13,18 +13,19 @@ public class IteratedLocalSearch
         while (counter < 9 && result.Sudoku.EvaluationResult != 0)
         {
             result = Step(result.Sudoku, visitedStates);
+            iterationCount++;
             if (!result.Improved) 
             { counter++; }
             else counter = 0;
 
             // debugging
-            Console.WriteLine($"New Sudoku score: {result.Sudoku.EvaluationResult}");
+            //Console.WriteLine($"New Sudoku score: {result.Sudoku.EvaluationResult}");
         }
         
         // if loop finishes, then either solution is found, or no improvement possible
         if (result.Sudoku.EvaluationResult == 0)
         {
-            return result.Sudoku;
+            return (result.Sudoku, iterationCount);
         }
         else
         {
@@ -32,11 +33,11 @@ public class IteratedLocalSearch
             result.Sudoku = RandomWalk(result.Sudoku, S_Waarde);
 
             // debugging
-            Console.WriteLine("random walk");
-            Console.WriteLine("Score after walk: " +  result.Sudoku.EvaluationResult);
+            //Console.WriteLine("random walk");
+            //Console.WriteLine("Score after walk: " +  result.Sudoku.EvaluationResult);
 
-            result.Sudoku = Solve(result.Sudoku, visitedStates); // recursion
-            return result.Sudoku;
+            (result.Sudoku, iterationCount) = Solve(result.Sudoku, visitedStates, iterationCount); // recursion
+            return (result.Sudoku, iterationCount);
         }
     }
 

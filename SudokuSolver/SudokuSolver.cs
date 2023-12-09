@@ -48,9 +48,9 @@ public class SudokuSolver
         return sudoku;
     }
 
-    public Sudoku Solve(Sudoku inputSudoku)
+    public (Sudoku solution, int iterationCount) Solve(Sudoku inputSudoku)
     {
-        var result = IteratedLocalSearch.Solve(inputSudoku, visitedStates);
+        var result = IteratedLocalSearch.Solve(inputSudoku, visitedStates, 0);
         return result;
     }
 }
