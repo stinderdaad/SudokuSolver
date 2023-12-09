@@ -10,20 +10,20 @@ public class Sudoku
 
     public int EvaluationResult => _evaluation.rows.Sum() + _evaluation.columns.Sum();
 
-    public Sudoku(int[,] input)
+    public Sudoku(int[,] input, bool setFixed)
     {
         for (var i = 0; i < 9; i++)
         {
             for (var j = 0; j < 9; j++)
             {
                 var value = input[i, j];
-                if (value == 0)
+                if (value == 0 || !setFixed)
                 {
                     _grid[i, j] = new SudokuItem(value, false);
                 }
                 else
                 {
-                    _grid[i, j] = new SudokuItem(value, true);
+                    _grid[i, j] = new SudokuItem(value, false);
                 }
             }
         }

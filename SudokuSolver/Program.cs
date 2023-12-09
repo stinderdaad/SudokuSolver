@@ -61,7 +61,7 @@ public class Program
 
         var solver = new SudokuSolver();
         var inputArray = SudokuSolver.GetInput();
-        var sudoku = solver.BuildSudoku(inputArray);
+        var sudoku = solver.BuildSudoku(inputArray, true);
         Console.WriteLine("Sudoku:");
         sudoku.Print();
         Console.WriteLine($"Evaluation function: {sudoku.EvaluationResult}");

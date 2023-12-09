@@ -40,9 +40,9 @@ public class SudokuSolver
         return inputSudoku;
     }
 
-    public Sudoku BuildSudoku(string[] inputArray)
+    public Sudoku BuildSudoku(string[] inputArray, bool isFixed)
     {
-        var sudoku = new Sudoku(PopulateArray(inputArray));
+        var sudoku = new Sudoku(PopulateArray(inputArray), isFixed);
         sudoku.InitState();
         visitedStates.Add(sudoku);
         return sudoku;
