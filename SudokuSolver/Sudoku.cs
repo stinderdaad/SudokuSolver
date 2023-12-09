@@ -10,6 +10,24 @@ public class Sudoku
 
     public int EvaluationResult => _evaluation.rows.Sum() + _evaluation.columns.Sum();
 
+    public override bool Equals(object? obj)
+    {
+        var other = (Sudoku)obj;
+
+        for (var i = 0; i < 9; i++)
+        {
+            for (var j = 0; j < 9; j++)
+            {
+                if (_grid[i, j].Number != other._grid[i, j].Number || _grid[i, j].IsFixed != other._grid[i, j].IsFixed)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public Sudoku(int[,] input, bool setFixed)
     {
         for (var i = 0; i < 9; i++)

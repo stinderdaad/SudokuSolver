@@ -116,6 +116,27 @@ public class Tests
     }
 
     [Test]
+    public void TwoSudokusSame()
+    {
+        var validSudoku = new int[9, 9]
+        {
+            {5, 3, 0, 0, 7, 0, 0, 0, 0},
+            {6, 0, 0, 1, 9, 5, 0, 0, 0},
+            {0, 9, 8, 0, 0, 0, 0, 6, 0},
+            {8, 0, 0, 0, 6, 0, 0, 0, 3},
+            {4, 0, 0, 8, 0, 3, 0, 0, 1},
+            {7, 0, 0, 0, 2, 0, 0, 0, 6},
+            {0, 6, 0, 0, 0, 0, 2, 8, 0},
+            {0, 0, 0, 4, 1, 9, 0, 0, 5},
+            {0, 0, 0, 0, 8, 0, 0, 7, 9}
+        };
+        var a = new Sudoku(validSudoku, true);
+        var b = new Sudoku(validSudoku, true);
+        Assert.That(a, Is.EqualTo(b));
+
+    }
+    
+    [Test]
     // Check that, if the input is a already valid sudoku, then the algorithm does not perform any iterations
     public void CheckCorrectSolution()
     {
@@ -218,7 +239,6 @@ public class Tests
             Console.WriteLine("Average number of iterations over " + iterations + " runs of puzzle " + counter + ": " + averageIterations);
             counter++;
         }
-
     }
 
     [Test]
