@@ -95,7 +95,7 @@ public class Tests
         for (var i = 0; i < n; i++)
         {
             var sudoku = _solver.BuildSudoku(GenerateSudoku(false).Split(' '), false);
-            var solution = _solver.Solve(sudoku);
+            var solution = _solver.Solve(sudoku, 2, 10000);
             Assert.That(solution.solution.EvaluationResult, Is.EqualTo(0));
         }
     }
@@ -150,7 +150,7 @@ public class Tests
                                          "2 8 7 4 1 9 6 3 5 " +
                                          "3 4 5 2 8 6 1 7 9";
         var sudoku = _solver.BuildSudoku(validSudokuString.Split(' '), true);
-        var solution = _solver.Solve(sudoku);
+        var solution = _solver.Solve(sudoku, 2, 10000);
         Assert.Multiple(() =>
         {
             Assert.That(solution.solution.EvaluationResult, Is.EqualTo(0));
@@ -165,7 +165,7 @@ public class Tests
         foreach (var input in _sampleInputs)
         {
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
-            var solution = _solver.Solve(sudoku);
+            var solution = _solver.Solve(sudoku, 2, 10000);
             if (solution.solution.EvaluationResult == 0)
             {
                 Assert.That(SolutionValid(solution.solution), Is.True);
@@ -197,7 +197,7 @@ public class Tests
     public void DetermineValidSolutionPercentage()
     {
         // The amount of times we want to run the algorithm
-        const int iterations = 10;
+        const int iterations = 1;
         var counter = 1;
         
         foreach (var input in _sampleInputs)
@@ -207,7 +207,7 @@ public class Tests
             
             for (var i = 0; i < iterations; i++)
             {
-                var solution = _solver.Solve(sudoku).solution;
+                var solution = _solver.Solve(sudoku, 2, 10000).solution;
                 if (solution.EvaluationResult == 0) validSolutions++;
             }
         
@@ -232,7 +232,7 @@ public class Tests
         
             for (var i = 0; i < iterations; i++)
             {
-                var solution = _solver.Solve(sudoku);
+                var solution = _solver.Solve(sudoku, 2, 10000);
                 totalIterations += solution.iterationCount;
             }
             var averageIterations = totalIterations / iterations;
@@ -250,7 +250,7 @@ public class Tests
         {
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
             var startingMemory = GC.GetTotalMemory(true);
-            var solution = _solver.Solve(sudoku);
+            var solution = _solver.Solve(sudoku, 2, 10000);
             var endingMemory = GC.GetTotalMemory(true);
             var memoryUsed = endingMemory - startingMemory;
             Console.WriteLine("Memory used for puzzle " + counter + ": " + memoryUsed);

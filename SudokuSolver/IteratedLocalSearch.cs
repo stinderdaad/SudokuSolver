@@ -4,13 +4,13 @@ public record struct SudokuResult(Sudoku Sudoku, bool Improved);
 
 public class IteratedLocalSearch
 {
-    public static (Sudoku solution, int iterationCount) Solve(Sudoku inputSudoku, HashSet<Sudoku> visitedStates, int iterationCount)
+    public static (Sudoku solution, int iterationCount) Solve(Sudoku inputSudoku, HashSet<Sudoku> visitedStates, int iterationCount, int sValue, int maxIterations)
     {
         var result = new SudokuResult(inputSudoku, true);
         var counter = 0; // counter telt hoe vaak achter elkaar er géén verbetering is. Als dat te vaak gebeurt is er een random walk
         
         // loops while result improves and solution is not yet found
-        while (counter < 9 && result.Sudoku.EvaluationResult != 0)
+        while (counter < 9 && result.Sudoku.EvaluationResult != 0 && iterationCount < maxIterations)
         {
             result = Step(result.Sudoku, visitedStates);
             iterationCount++;
@@ -23,20 +23,19 @@ public class IteratedLocalSearch
         }
         
         // if loop finishes, then either solution is found, or no improvement possible
-        if (result.Sudoku.EvaluationResult == 0)
+        if (result.Sudoku.EvaluationResult == 0 || iterationCount >= maxIterations)
         {
             return (result.Sudoku, iterationCount);
         }
         else
         {
-            var S_Waarde = 2;
-            result.Sudoku = RandomWalk(result.Sudoku, S_Waarde);
+            result.Sudoku = RandomWalk(result.Sudoku, sValue);
 
             // debugging
             //Console.WriteLine("random walk");
             //Console.WriteLine("Score after walk: " +  result.Sudoku.EvaluationResult);
 
-            (result.Sudoku, iterationCount) = Solve(result.Sudoku, visitedStates, iterationCount); // recursion
+            (result.Sudoku, iterationCount) = Solve(result.Sudoku, visitedStates, iterationCount, sValue, maxIterations); // recursion
             return (result.Sudoku, iterationCount);
         }
     }
