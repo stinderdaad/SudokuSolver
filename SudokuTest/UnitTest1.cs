@@ -10,8 +10,7 @@ public class Tests
                                            " 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 " +
                                            "0 9 0 0 5 0 1 0 3 0 0";
     // Represents the 5 given sample inputs
-    private readonly string[] _sampleInputs = new string[]
-    {
+    private readonly string[] _sampleInputs = {
         "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0",
         "2 0 0 0 8 0 3 0 0 0 6 0 0 7 0 0 8 4 0 3 0 5 0 0 2 0 9 0 0 0 1 0 5 4 0 8 0 0 0 0 0 0 0 0 0 4 0 2 7 0 6 0 0 0 3 0 1 0 0 7 0 4 0 7 2 0 0 4 0 0 6 0 0 0 4 0 1 0 0 0 3",
         "0 0 0 0 0 0 9 0 7 0 0 0 4 2 0 1 8 0 0 0 0 7 0 5 0 2 6 1 0 0 9 0 4 0 0 0 0 5 0 0 0 0 0 4 0 0 0 0 5 0 7 0 0 9 9 2 0 1 0 8 0 0 0 0 3 4 0 5 9 0 0 0 5 0 7 0 0 0 0 0 0",
@@ -114,7 +113,7 @@ public class Tests
             }
         }
     }
-
+    
     [Test]
     public void TwoSudokusSame()
     {
@@ -158,6 +157,29 @@ public class Tests
         });
     }
 
+    [Test]
+    // Check that, if a solution is not found within some arbitrary amount of iterations, the algorithm terminates
+    public void CheckILSTerminate()
+    {
+        const string invalidSudokuString = "3 3 4 6 7 8 9 1 2 " +
+                                         "6 7 2 1 9 5 3 4 8 " +
+                                         "1 9 8 3 4 2 5 6 7 " +
+                                         "8 5 9 7 6 1 4 2 3 " +
+                                         "4 2 6 8 5 3 7 9 1 " +
+                                         "7 1 3 9 2 4 8 5 6 " +
+                                         "9 6 1 5 3 7 2 8 4 " +
+                                         "2 8 7 4 1 9 6 3 5 " +
+                                         "3 4 5 2 8 6 1 7 9";
+        const int maxIterations = 10000;
+        var sudoku = _solver.BuildSudoku(invalidSudokuString.Split(' '), true);
+        var solution = _solver.Solve(sudoku, 0, maxIterations);
+        Assert.Multiple(() =>
+        {
+            Assert.That(solution.solution.EvaluationResult, Is.Not.EqualTo(0));
+            Assert.That(solution.iterationCount, Is.GreaterThanOrEqualTo(maxIterations));
+        });
+    }
+        
     [Test]
     // Check that, if a solution is found, the solution is a valid sudoku
     public void CheckSolutionIsValid()
@@ -239,6 +261,27 @@ public class Tests
             Console.WriteLine("Average number of iterations over " + iterations + " runs of puzzle " + counter + ": " + averageIterations);
             counter++;
         }
+    }
+    
+    [Test]
+    // Test multiple different S values (distances for random walk)
+    public void SValueExperiments()
+    {
+        var sValues = Enumerable.Range(0,10).ToList();
+        var counter = 1;
+
+        foreach (var input in _sampleInputs)
+        {
+            var sudoku = _solver.BuildSudoku(input.Split(' '), true);
+            foreach (var s in sValues)
+            {
+                var solution = _solver.Solve(sudoku, s, 10000);
+                Console.WriteLine("Puzzle: " + counter + " - S value: " + s + " - Iterations: " + solution.iterationCount);
+            }
+
+            counter++;
+        }
+
     }
 
     [Test]
