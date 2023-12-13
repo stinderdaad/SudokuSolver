@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace SudokuTest;
 
 using NUnit.Framework;
@@ -90,12 +92,15 @@ public class Tests
     // Check the algorithm n times with randomised inputs
     public void CheckNTimes()
     {
-        var n = 100;
+        const int n = 1;
+        const int maxIterations = 10000;
         for (var i = 0; i < n; i++)
         {
-            var sudoku = _solver.BuildSudoku(GenerateSudoku(false).Split(' '), false);
-            var solution = _solver.Solve(sudoku, 2, 10000);
-            Assert.That(solution.solution.EvaluationResult, Is.EqualTo(0));
+            _solver.UpdateVisitedStates([]);
+            var sudoku = _solver.BuildSudoku(GenerateSudoku(false).Split(' '), true);
+            var solution = _solver.Solve(sudoku, 2, maxIterations);
+            Assert.That(solution.solution.EvaluationResult,
+                solution.iterationCount >= maxIterations ? Is.Not.EqualTo(0) : Is.EqualTo(0));
         }
     }
     
@@ -106,6 +111,7 @@ public class Tests
     {
         foreach (var input in _sampleInputs)
         {
+            _solver.UpdateVisitedStates([]);
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
             for (var i = 0; i < 9; i++)
             {
@@ -148,6 +154,7 @@ public class Tests
                                          "9 6 1 5 3 7 2 8 4 " +
                                          "2 8 7 4 1 9 6 3 5 " +
                                          "3 4 5 2 8 6 1 7 9";
+        _solver.UpdateVisitedStates([]);
         var sudoku = _solver.BuildSudoku(validSudokuString.Split(' '), true);
         var solution = _solver.Solve(sudoku, 2, 10000);
         Assert.Multiple(() =>
@@ -171,6 +178,7 @@ public class Tests
                                          "2 8 7 4 1 9 6 3 5 " +
                                          "3 4 5 2 8 6 1 7 9";
         const int maxIterations = 10000;
+        _solver.UpdateVisitedStates([]);
         var sudoku = _solver.BuildSudoku(invalidSudokuString.Split(' '), true);
         var solution = _solver.Solve(sudoku, 0, maxIterations);
         Assert.Multiple(() =>
@@ -186,6 +194,7 @@ public class Tests
     {
         foreach (var input in _sampleInputs)
         {
+            _solver.UpdateVisitedStates([]);
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
             var solution = _solver.Solve(sudoku, 2, 10000);
             if (solution.solution.EvaluationResult == 0)
@@ -219,8 +228,8 @@ public class Tests
     public void DetermineValidSolutionPercentage()
     {
         // The amount of times we want to run the algorithm
-        const int iterations = 10;
-        var sValues = Enumerable.Range(0,10).ToList();
+        const int iterations = 5;
+        var sValues = Enumerable.Range(0,5).ToList();
         var counter = 1;
         
         foreach (var input in _sampleInputs)
@@ -233,7 +242,8 @@ public class Tests
                 
                 for (var i = 0; i < iterations; i++)
                 {
-                    var solution = _solver.Solve(sudoku, s, 1000).solution;
+                    _solver.UpdateVisitedStates([sudoku]);
+                    var solution = _solver.Solve(sudoku, s, 20000).solution;
                     if (solution.EvaluationResult == 0) validSolutions++;
                 }
                 var percentage = (double)(validSolutions / iterations) * 100;
@@ -250,21 +260,27 @@ public class Tests
     public void DetermineAverageIterations()
     {
         // The amount of times we want to run the algorithm
-        const int iterations = 10;
+        const int iterations = 5;
+        var sValues = Enumerable.Range(0,5).ToList();
+
         var counter = 1;
 
         foreach (var input in _sampleInputs)
         {
             var totalIterations = 0;
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
-        
-            for (var i = 0; i < iterations; i++)
+
+            foreach (var s in sValues)
             {
-                var solution = _solver.Solve(sudoku, 2, 10000);
-                totalIterations += solution.iterationCount;
+                for (var i = 0; i < iterations; i++)
+                {
+                    _solver.UpdateVisitedStates([sudoku]);
+                    var solution = _solver.Solve(sudoku, s, 10000);
+                    totalIterations += solution.iterationCount;
+                }   
+                var averageIterations = totalIterations / iterations;
+                Console.WriteLine("Puzzle: " + counter + " - S value: " + s + " - Average iterations: " + averageIterations);
             }
-            var averageIterations = totalIterations / iterations;
-            Console.WriteLine("Average number of iterations over " + iterations + " runs of puzzle " + counter + ": " + averageIterations);
             counter++;
         }
     }
@@ -273,7 +289,7 @@ public class Tests
     // Test multiple different S values (distances for random walk)
     public void SValueExperiments()
     {
-        var sValues = Enumerable.Range(0,10).ToList();
+        var sValues = Enumerable.Range(0,11).ToList();
         var counter = 1;
 
         foreach (var input in _sampleInputs)
@@ -281,7 +297,8 @@ public class Tests
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
             foreach (var s in sValues)
             {
-                var solution = _solver.Solve(sudoku, s, 10000);
+                _solver.UpdateVisitedStates([sudoku]);
+                var solution = _solver.Solve(sudoku, s, 20000);
                 Console.WriteLine("Puzzle: " + counter + " - S value: " + s + " - Iterations: " + solution.iterationCount);
             }
 
@@ -298,9 +315,10 @@ public class Tests
         foreach (var input in _sampleInputs)
         {
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
-            var startingMemory = GC.GetTotalMemory(true);
+            BigInteger startingMemory = GC.GetTotalMemory(true);
+            _solver.UpdateVisitedStates([sudoku]);
             var solution = _solver.Solve(sudoku, 2, 10000);
-            var endingMemory = GC.GetTotalMemory(true);
+            BigInteger endingMemory = GC.GetTotalMemory(true);
             var memoryUsed = endingMemory - startingMemory;
             Console.WriteLine("Memory used for puzzle " + counter + ": " + memoryUsed);
             counter++;

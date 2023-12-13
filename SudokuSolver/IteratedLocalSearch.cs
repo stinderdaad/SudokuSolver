@@ -10,7 +10,7 @@ public class IteratedLocalSearch
         var previousResult = new Sudoku(inputSudoku);
         var counter = 0; // counter telt hoe vaak achter elkaar er géén verbetering is. Als dat te vaak gebeurt is er een random walk
         var unvisitedSquares = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 }; // houdt bij welke vierkanten al bezocht zijn om snel lokaal maximum te bepalen
-        
+
         // loops while result improves and solution is not yet found
         while (unvisitedSquares.Count != 0 && counter < 9 && result.Sudoku.EvaluationResult != 0 && iterationCount < maxIterations)
         {
