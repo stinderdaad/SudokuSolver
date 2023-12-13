@@ -5,6 +5,10 @@ public class SudokuSolver
 {
     HashSet<Sudoku> visitedStates = [];
 
+    public void UpdateVisitedStates(HashSet<Sudoku> newVisitedStates)
+    {
+        visitedStates = newVisitedStates;
+    }
     public SudokuSolver() { }
 
     public static string[] GetInput()
