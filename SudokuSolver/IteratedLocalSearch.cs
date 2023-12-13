@@ -12,8 +12,7 @@ public class IteratedLocalSearch
         var unvisitedSquares = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 }; // houdt bij welke vierkanten al bezocht zijn om snel lokaal maximum te bepalen
         
         // loops while result improves and solution is not yet found
-        while (unvisitedSquares.Count != 0 && counter < 9 && result.Sudoku.EvaluationResult != 0)
-        while (counter < 9 && result.Sudoku.EvaluationResult != 0 && iterationCount < maxIterations)
+        while (unvisitedSquares.Count != 0 && counter < 9 && result.Sudoku.EvaluationResult != 0 && iterationCount < maxIterations)
         {
             result = Step(result.Sudoku, visitedStates, unvisitedSquares);
             iterationCount++;
