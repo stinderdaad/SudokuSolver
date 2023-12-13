@@ -219,23 +219,29 @@ public class Tests
     public void DetermineValidSolutionPercentage()
     {
         // The amount of times we want to run the algorithm
-        const int iterations = 1;
+        const int iterations = 10;
+        var sValues = Enumerable.Range(0,10).ToList();
         var counter = 1;
         
         foreach (var input in _sampleInputs)
         {
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
-            var validSolutions = 0;
-            
-            for (var i = 0; i < iterations; i++)
+
+            foreach (var s in sValues)
             {
-                var solution = _solver.Solve(sudoku, 2, 10000).solution;
-                if (solution.EvaluationResult == 0) validSolutions++;
+                var validSolutions = 0;
+                
+                for (var i = 0; i < iterations; i++)
+                {
+                    var solution = _solver.Solve(sudoku, s, 1000).solution;
+                    if (solution.EvaluationResult == 0) validSolutions++;
+                }
+                var percentage = (double)(validSolutions / iterations) * 100;
+                Console.WriteLine("Puzzle:" + counter + " - S value: " + s + " - Percentage: " + percentage);
+                //Console.WriteLine("Percentage of valid solutions over " + iterations + " runs of puzzle " + counter + ": " + percentage);
             }
-        
-            var percentage = (double)(validSolutions / iterations) * 100;
-            Console.WriteLine("Percentage of valid solutions over " + iterations + " runs of puzzle " + counter + ": " + percentage);
             counter++;
+
         }
     }
 
