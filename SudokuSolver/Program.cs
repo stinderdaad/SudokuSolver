@@ -12,7 +12,7 @@ public class Program
         // Input can be provided in 2 ways:
         // 1. As Console input (like is the case below)
         // 2. As a string representation of a Sudoku puzzle (row for row)
-        // If you wish to use case 2, comment out line 37 and 38 and uncomment line 39 and define a sudokuString variable
+        // If you wish to use case 2, comment out line 41 and 42 and uncomment line 43 and (re)define a sudokuString variable
         //
         // BuildSudoku takes 2 arguments: the input array and a boolean that indicates whether
         //  the input is fixed or not.
@@ -34,9 +34,13 @@ public class Program
         
         var solver = new SudokuSolver();
         
+        /*const string sudokuString = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9" +
+                                    " 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 " +
+                                    "0 9 0 0 5 0 1 0 3 0 0";*/
+        
         var inputArray = SudokuSolver.GetInput();
         var sudoku = solver.BuildSudoku(inputArray, true);
-        //var sudoku = _solver.BuildSudoku(sudokuString.Split(' '), true);
+        //var sudoku = solver.BuildSudoku(sudokuString.Split(' '), true);
 
         Console.WriteLine("Sudoku:");
         sudoku.Print();
