@@ -44,5 +44,7 @@ public class Program
         var solution = solver.Solve(sudoku, 2, 10000);
         Console.WriteLine("Solution:");
         solution.solution.Print();
+        // If you wish to see the amount of iterations it took:
+        //Console.WriteLine($"Iterations: {solution.iterationCount}");
     }
 }
