@@ -243,11 +243,10 @@ public class Tests
                 for (var i = 0; i < iterations; i++)
                 {
                     _solver.UpdateVisitedStates([sudoku]);
-                    var solution = _solver.Solve(sudoku, s, 20000).solution;
+                    var solution = _solver.Solve(sudoku, s, 10000).solution;
                     if (solution.EvaluationResult == 0) validSolutions++;
                 }
-                var percentage = (double)(validSolutions / iterations) * 100;
-                Console.WriteLine("Puzzle:" + counter + " - S value: " + s + " - Percentage: " + percentage);
+                Console.WriteLine("Puzzle:" + counter + " - S value: " + s + " - Percentage: " + validSolutions);
                 //Console.WriteLine("Percentage of valid solutions over " + iterations + " runs of puzzle " + counter + ": " + percentage);
             }
             counter++;
@@ -267,11 +266,11 @@ public class Tests
 
         foreach (var input in _sampleInputs)
         {
-            var totalIterations = 0;
             var sudoku = _solver.BuildSudoku(input.Split(' '), true);
 
             foreach (var s in sValues)
             {
+                var totalIterations = 0;
                 for (var i = 0; i < iterations; i++)
                 {
                     _solver.UpdateVisitedStates([sudoku]);

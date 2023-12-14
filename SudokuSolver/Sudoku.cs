@@ -4,12 +4,16 @@ public record struct SudokuItem(int Number, bool IsFixed);
 
 public class Sudoku
 {
-    // list of rows. Tuple contains (value, fixed).
+    // Each cell in the Sudoku grid is represented by a SudokuItem, which contains a number and a boolean
+    // The number is the value of the cell, and the boolean indicates whether the number is fixed or not
     private readonly SudokuItem[,] _grid = new SudokuItem[9, 9];
     private readonly (int[] rows, int[] columns) _evaluation = (new int[9], new int[9]);
 
+    // Represents the evaluation value of the Sudoku
     public int EvaluationResult => _evaluation.rows.Sum() + _evaluation.columns.Sum();
 
+    // Allow 2 sudoku's to be compared
+    // 2 sudoku's are the same if they have the same numbers in the same places and the same fixed numbers
     public override bool Equals(object? obj)
     {
         var other = (Sudoku)obj;
@@ -28,6 +32,7 @@ public class Sudoku
         return true;
     }
 
+    // Initialize a Sudoku object from an input array and whether or not the input is fixed
     public Sudoku(int[,] input, bool setFixed)
     {
         for (var i = 0; i < 9; i++)
@@ -47,7 +52,7 @@ public class Sudoku
         }
     }
 
-    // constructor om een nieuw Sudoku object te maken van een bestaande Sudoku
+    // Generate a new Sudoku object from an existing Sudoku object
     public Sudoku(Sudoku sudoku)
     {
         _grid = (SudokuItem[,])sudoku._grid.Clone();
@@ -77,6 +82,7 @@ public class Sudoku
         EvaluateGrid();
     }
 
+    // Returns a Sudoku row at the given index
     public SudokuItem[] GetRow(int index)
     {
         var row = new SudokuItem[9];
@@ -86,7 +92,8 @@ public class Sudoku
         }
         return row;
     }
-
+    
+    // Returns a Sudoku column at the given index
     public SudokuItem[] GetColumn(int index)
     {
         var column = new SudokuItem[9];
@@ -97,6 +104,7 @@ public class Sudoku
         return column;
     }
 
+    // Returns the SudokuItem number values as an int array
     private static int[] ValuesFrom(SudokuItem[] array)
     {
         var values = new int[9];
@@ -107,10 +115,7 @@ public class Sudoku
         return values;
     }
 
-    // squares have index:
-    // 0 1 2
-    // 3 4 5
-    // 6 7 8
+    // Returns a Sudoku square at the given index (squares follow a row wise order)
     public SudokuItem[] GetSquare(int index)
     {
         var square = new SudokuItem[9];
@@ -128,7 +133,7 @@ public class Sudoku
         return square;
     }
 
-    // puts an input square into the grid, then updates the evaluation function
+    // Puts an input square into the grid, then updates the evaluation function
     public void PutSquare(SudokuItem[] square, int index, int a = -1, int b = -1)
     {
         var x = (index / 3) * 3;
@@ -143,14 +148,14 @@ public class Sudoku
             }
         }
 
-        // als er geen waarde aan a en b zijn gegeven, dan wordt evaluatiefunctie niet uitgevoerd
+        // If a and b are not -1, then we know that we swapped 2 numbers in the square and we should update the evaluation
         if (a != -1 && b != -1)
         {
             UpdateEvaluation(index, a, b);
         }
-        //EvaluateGrid();
     }
 
+    // Determine the missing distinct numbers from a row, given the row index
     private void EvaluateRow(int row)
     {
         _evaluation.rows[row] = 0;
@@ -164,6 +169,7 @@ public class Sudoku
         }
     }
 
+    // Determine the missing distinct numbers from a column, given the column index
     private void EvaluateColumn(int col)
     {
         _evaluation.columns[col] = 0;
@@ -177,7 +183,8 @@ public class Sudoku
         }
     }
 
-    public void EvaluateGrid()
+    // Evaluate the entire Sudoku grid
+    private void EvaluateGrid()
     {
         for (var i = 0; i < 9; i++)
         {
@@ -186,7 +193,7 @@ public class Sudoku
         }
     }
 
-    // update alleen de evaluatie voor die rijen en kolommen die veranderd zijn door de swap
+    // Only update the evaluation function for the rows and columns that are affected by the swap
     private void UpdateEvaluation(int index, int a, int b)
     {
         var row1 = (index / 3) * 3 + (a / 3);
@@ -200,12 +207,13 @@ public class Sudoku
         if (col2 != col1) EvaluateColumn(col2);
     }
 
-    public static SudokuItem[] Swap(SudokuItem[] square, int a, int b)
+    // Swap 2 numbers within a square at indices a and b
+    public static void Swap(SudokuItem[] square, int a, int b)
     {
         (square[a], square[b]) = (square[b], square[a]);
-        return square;
     }
 
+    // Pretty print a Sudoku grid
     public void Print()
     {
         Console.WriteLine("-------------------------------");
@@ -217,13 +225,14 @@ public class Sudoku
                 {
                     Console.Write("|");
                 }
+                // Fixed numbers are colored red
                 if (_grid[i, j].IsFixed)
                     Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write(" " + _grid[i, j].Number + " ");
                 Console.ResetColor();
             }
 
-            // evaluation score per row
+            // Evaluation score per row
             Console.WriteLine($"|{i}: {_evaluation.rows[i]}");
 
             if (i % 3 == 2)
@@ -232,7 +241,7 @@ public class Sudoku
             }
         }
 
-        // evaluation score per column
+        // Evaluation score per column
         Console.Write("|");
         for (var i = 0; i < 9; i++)
         {

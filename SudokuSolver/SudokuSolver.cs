@@ -3,14 +3,16 @@ using System;
 
 public class SudokuSolver
 {
+    // Keep track of visited states to prevent cycling
     HashSet<Sudoku> visitedStates = [];
 
+    // Update the visited states, used to reset the visited states between runs in the tests
     public void UpdateVisitedStates(HashSet<Sudoku> newVisitedStates)
     {
         visitedStates = newVisitedStates;
     }
-    public SudokuSolver() { }
 
+    // Get user input from the Console
     public static string[] GetInput()
     {
         Console.WriteLine(
@@ -23,10 +25,10 @@ public class SudokuSolver
         var inputArray = inputString.Split(' ');
         return inputArray;
     }
-
+    
+    // Populate the sudoku grid (input is assumed as row-wise so numbers 1-9 are in the first row,
+    // 10-18 in the second etc.)
     private static int[,] PopulateArray(string[] inputArray) {
-        // Populate the sudoku grid (input is assumed as row-wise so numbers 1-9 are in the first row,
-        // 10-18 in the second etc.)
         var inputSudoku = new int[9, 9];
         var index = 0;
         for (var i = 0; i < 9; i++)
@@ -44,14 +46,18 @@ public class SudokuSolver
         return inputSudoku;
     }
 
+    // Build a Sudoku object from the input array, and whether the input is fixed or not
     public Sudoku BuildSudoku(string[] inputArray, bool isFixed)
     {
         var sudoku = new Sudoku(PopulateArray(inputArray), isFixed);
         sudoku.InitState();
+        // Add the initial state to the visited states
         visitedStates.Add(sudoku);
         return sudoku;
     }
 
+    // Solve the Sudoku using the Iterated Local Search algorithm
+    // returns a Tuple containing the resulting sudoku and the amount of iterations it took
     public (Sudoku solution, int iterationCount) Solve(Sudoku inputSudoku, int sValue, int maxIterations)
     {
         var result = IteratedLocalSearch.Solve(inputSudoku, visitedStates, 0, sValue, maxIterations);

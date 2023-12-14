@@ -5,63 +5,39 @@ public class Program
 {
     public static void Main()
     {
-        // var input = new int[9, 9]
-        // {
-        //     { 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-        //     { 9, 8, 7, 6, 5, 4, 3, 2, 1 },
-        //     { 4, 5, 6, 7, 8, 9, 1, 2, 3 },
-        //     { 3, 1, 2, 8, 4, 5, 9, 7, 6 },
-        //     { 6, 9, 8, 1, 2, 3, 4, 5, 7 },
-        //     { 7, 4, 5, 9, 6, 1, 8, 3, 2 },
-        //     { 8, 6, 4, 2, 9, 7, 5, 1, 3 },
-        //     { 5, 7, 1, 3, 4, 8, 2, 6, 9 },
-        //     { 2, 3, 9, 5, 1, 6, 8, 4, 7 }
-        // };
-        // var sudoku = new Sudoku(input);
-        // sudoku.Print();
-
-        // var input = new int[9, 9]
-        // {
-        //     { 0, 2, 3, 0, 0, 6, 7, 0, 9 },
-        //     { 9, 0, 0, 6, 5, 4, 3, 0, 1 },
-        //     { 4, 5, 6, 0, 8, 9, 1, 0, 3 },
-        //     { 3, 1, 0, 8, 4, 5, 0, 7, 6 },
-        //     { 0, 0, 0, 1, 2, 3, 0, 5, 0 },
-        //     { 7, 4, 5, 0, 0, 1, 0, 3, 2 },
-        //     { 0, 6, 4, 2, 9, 7, 5, 1, 0 },
-        //     { 5, 0, 0, 0, 4, 0, 2, 0, 9 },
-        //     { 2, 3, 9, 5, 1, 6, 0, 4, 7 }
-        // };
-        // var sudoku = new Sudoku(input);
-        // sudoku.InitState();
-        // Console.WriteLine(" Init: ");
-        // sudoku.Print();
-        // var solver = new SudokuSolver();
-        // var walked = solver.RandomWalk(sudoku, 5);
-        // Console.WriteLine("Walked:");
-        // walked.Print();
-
-        // var input = new int[9, 9]
-        // {
-        //     { 0, 2, 3, 0, 0, 6, 7, 0, 9 },
-        //     { 9, 0, 0, 6, 5, 4, 3, 0, 1 },
-        //     { 4, 5, 6, 0, 8, 9, 1, 0, 3 },
-        //     { 3, 1, 0, 8, 4, 5, 0, 7, 6 },
-        //     { 0, 0, 0, 1, 2, 3, 0, 5, 0 },
-        //     { 7, 4, 5, 0, 0, 1, 0, 3, 2 },
-        //     { 0, 6, 4, 2, 9, 7, 5, 1, 0 },
-        //     { 5, 0, 0, 0, 4, 0, 2, 0, 9 },
-        //     { 2, 3, 9, 5, 1, 6, 0, 4, 7 }
-        // };
-        // var sudoku = new Sudoku(input);
-        // sudoku.Print();
-        // Console.WriteLine(" Init: ");
-        // sudoku.InitState();
-        // sudoku.Print();
-
+        //**********************************//
+        //** How to run the Sudoku Solver **//
+        //
+        // The code below is an example of how to run the Sudoku Solver.
+        // Input can be provided in 2 ways:
+        // 1. As Console input (like is the case below)
+        // 2. As a string representation of a Sudoku puzzle (row for row)
+        // If you wish to use case 2, comment out line 37 and 38 and uncomment line 39 and define a sudokuString variable
+        //
+        // BuildSudoku takes 2 arguments: the input array and a boolean that indicates whether
+        //  the input is fixed or not.
+        // If the boolean is set to False, then no numbers of the input will be set to fixed.
+        //  This way the program could solve fully filled in sudoku's for example.
+        // If the boolean is set to True, then every non-zero number of the input will be set to fixed
+        //
+        // The application then prints the input sudoku in the Console followed by its initial evaluation value
+        //  (red numbers are fixed, values at the end of rows/columns are the respective evaluation values for those rows/columns)
+        // After that we solve the sudoku using the Iterated Local Search algorithm.
+        // Solve takes 3 arguments: the sudoku to solve, the sValue and the maximum number of iterations.
+        // The sValue is the number of times you want to execute random-walk.
+        // The maximum number of iterations is the maximum number of iterations the algorithm will
+        //  run before automatically terminating.
+        
+        // After this is done, the solution will be printed to the Console.
+        //**********************************//
+        //**********************************//
+        
         var solver = new SudokuSolver();
+        
         var inputArray = SudokuSolver.GetInput();
         var sudoku = solver.BuildSudoku(inputArray, true);
+        //var sudoku = _solver.BuildSudoku(sudokuString.Split(' '), true);
+
         Console.WriteLine("Sudoku:");
         sudoku.Print();
         Console.WriteLine($"Evaluation function: {sudoku.EvaluationResult}");
