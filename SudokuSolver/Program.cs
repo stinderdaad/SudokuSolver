@@ -39,8 +39,15 @@ public class Program
                                     "0 9 0 0 5 0 1 0 3 0 0";*/
         
         var inputArray = SudokuSolver.GetInput();
-        var sudoku = new Sudoku(SudokuSolver.PopulateArray(inputArray), true);
+        var numberArray = SudokuSolver.PopulateArray(inputArray);
+        var sudoku = new Sudoku(numberArray, true);
+        Console.WriteLine("Sudoku:");
         sudoku.Print();
+        var solution = ChronologicalBackTracking.CBT(sudoku, 0);
+
+        Console.WriteLine("Solution:");
+        solution.Item1.Print();
+        Console.WriteLine($"Iterations: {solution.Item2}");
 
         //************************P1************************//
         // var sudoku = solver.BuildSudoku(inputArray, true);

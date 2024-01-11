@@ -6,8 +6,8 @@ public class Sudoku
 {
     // Each cell in the Sudoku grid is represented by a SudokuItem, which contains a number and a boolean
     // The number is the value of the cell, and the boolean indicates whether the number is fixed or not
-    private readonly SudokuItem[,] _grid = new SudokuItem[9, 9];
     private readonly (int[] rows, int[] columns) _evaluation = (new int[9], new int[9]);
+    public SudokuItem[,] Grid { get; set; } = new SudokuItem[9, 9];
 
     // Represents the evaluation value of the Sudoku
     public int EvaluationResult => _evaluation.rows.Sum() + _evaluation.columns.Sum();
@@ -22,7 +22,7 @@ public class Sudoku
         {
             for (var j = 0; j < 9; j++)
             {
-                if (_grid[i, j].Number != other._grid[i, j].Number || _grid[i, j].IsFixed != other._grid[i, j].IsFixed)
+                if (Grid[i, j].Number != other.Grid[i, j].Number || Grid[i, j].IsFixed != other.Grid[i, j].IsFixed)
                 {
                     return false;
                 }
@@ -42,11 +42,11 @@ public class Sudoku
                 var value = input[i, j];
                 if (value == 0 || !setFixed)
                 {
-                    _grid[i, j] = new SudokuItem(value, false);
+                    Grid[i, j] = new SudokuItem(value, false);
                 }
                 else
                 {
-                    _grid[i, j] = new SudokuItem(value, true);
+                    Grid[i, j] = new SudokuItem(value, true);
                 }
             }
         }
@@ -55,7 +55,7 @@ public class Sudoku
     // Generate a new Sudoku object from an existing Sudoku object
     public Sudoku(Sudoku sudoku)
     {
-        _grid = (SudokuItem[,])sudoku._grid.Clone();
+        Grid = (SudokuItem[,])sudoku.Grid.Clone();
         EvaluateGrid();
     }
 
@@ -88,7 +88,7 @@ public class Sudoku
         var row = new SudokuItem[9];
         for (var i = 0; i < 9; i++)
         {
-            row[i] = _grid[index, i];
+            row[i] = Grid[index, i];
         }
         return row;
     }
@@ -99,7 +99,7 @@ public class Sudoku
         var column = new SudokuItem[9];
         for (var i = 0; i < 9; i++)
         {
-            column[i] = _grid[i, index];
+            column[i] = Grid[i, index];
         }
         return column;
     }
@@ -126,7 +126,7 @@ public class Sudoku
         {
             for (var k = y; k < y + 3; k++)
             {
-                square[i] = _grid[j, k];
+                square[i] = Grid[j, k];
                 i++;
             }
         }
@@ -143,7 +143,7 @@ public class Sudoku
         {
             for (var k = y; k < y + 3; k++)
             {
-                _grid[j, k] = square[i];
+                Grid[j, k] = square[i];
                 i++;
             }
         }
@@ -226,9 +226,9 @@ public class Sudoku
                     Console.Write("|");
                 }
                 // Fixed numbers are colored red
-                if (_grid[i, j].IsFixed)
+                if (Grid[i, j].IsFixed)
                     Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(" " + _grid[i, j].Number + " ");
+                Console.Write(" " + Grid[i, j].Number + " ");
                 Console.ResetColor();
             }
 
