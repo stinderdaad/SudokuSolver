@@ -28,7 +28,7 @@ public class SudokuSolver
     
     // Populate the sudoku grid (input is assumed as row-wise so numbers 1-9 are in the first row,
     // 10-18 in the second etc.)
-    private static int[,] PopulateArray(string[] inputArray) {
+    public static int[,] PopulateArray(string[] inputArray) {
         var inputSudoku = new int[9, 9];
         var index = 0;
         for (var i = 0; i < 9; i++)

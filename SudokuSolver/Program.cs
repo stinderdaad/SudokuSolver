@@ -39,16 +39,21 @@ public class Program
                                     "0 9 0 0 5 0 1 0 3 0 0";*/
         
         var inputArray = SudokuSolver.GetInput();
-        var sudoku = solver.BuildSudoku(inputArray, true);
-        //var sudoku = solver.BuildSudoku(sudokuString.Split(' '), true);
-
-        Console.WriteLine("Sudoku:");
+        var sudoku = new Sudoku(SudokuSolver.PopulateArray(inputArray), true);
         sudoku.Print();
-        Console.WriteLine($"Evaluation function: {sudoku.EvaluationResult}");
-        var solution = solver.Solve(sudoku, 2, 10000);
-        Console.WriteLine("Solution:");
-        solution.solution.Print();
-        // If you wish to see the amount of iterations it took:
-        //Console.WriteLine($"Iterations: {solution.iterationCount}");
+
+        //************************P1************************//
+        // var sudoku = solver.BuildSudoku(inputArray, true);
+        // //var sudoku = solver.BuildSudoku(sudokuString.Split(' '), true);
+        //
+        // Console.WriteLine("Sudoku:");
+        // sudoku.Print();
+        // Console.WriteLine($"Evaluation function: {sudoku.EvaluationResult}");
+        // var solution = solver.Solve(sudoku, 2, 10000);
+        // Console.WriteLine("Solution:");
+        // solution.solution.Print();
+        // // If you wish to see the amount of iterations it took:
+        // //Console.WriteLine($"Iterations: {solution.iterationCount}");
+        //************************P1************************//
     }
 }
