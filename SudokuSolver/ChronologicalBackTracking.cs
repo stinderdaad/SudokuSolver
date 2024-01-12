@@ -16,7 +16,7 @@ public class ChronologicalBackTracking
                 var curr = sudoku.Grid[i, j].Number;
                 var counter = 0;
 
-                if (curr != 0 || sudoku.Grid[i, j].IsFixed) continue;
+                if (sudoku.Grid[i, j].IsFixed) continue;
 
                 sudoku.Grid[i, j] = new SudokuItem(range[counter], false);
                 iterationCount++;
@@ -40,7 +40,7 @@ public class ChronologicalBackTracking
                             j--;
                         }
 
-                        while (sudoku.Grid[i, j].IsFixed)
+                        while (sudoku.Grid[i, j].IsFixed || sudoku.Grid[i, j].Number == 9)
                         {
                             if (j == 0)
                             {
@@ -53,9 +53,9 @@ public class ChronologicalBackTracking
                                 j--;
                             }
                         }
-
                         counter = sudoku.Grid[i, j].Number;
-                        sudoku.Grid[i, j] = new SudokuItem(0, false);
+                        //sudoku.Grid[i, j] = new SudokuItem(0, false);
+                        sudoku.Grid[i, j] = new SudokuItem(range[counter], false);
                         iterationCount++;
                     }
                     else
@@ -64,6 +64,7 @@ public class ChronologicalBackTracking
                         iterationCount++;
                     }
                 }
+                //Console.WriteLine("Done with row" + j);
             }
         }
         return (sudoku, iterationCount);
