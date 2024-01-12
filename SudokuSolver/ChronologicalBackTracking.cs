@@ -8,11 +8,8 @@ public class ChronologicalBackTracking
     private static readonly Sudoku ErrorSudoku = new Sudoku(new int[9,9], true);
 
     // Solve a Sudoku using the Chronological Backtracking algorithm
-    public static (Sudoku, int) CBT(Sudoku sudoku, int iterationCount)
+    public static (Sudoku, int) CBT(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount)
     {
-        // Determine the values that each cell can have
-        var range = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        
         // Traverse the sudoku left-to-right, top-to-bottom
         for (var i = 0; i < 9; i++)
         {
@@ -22,6 +19,9 @@ public class ChronologicalBackTracking
 
                 // Some numbers in the input are fixed, we should not alter these
                 if (sudoku.Grid[i, j].IsFixed) continue;
+
+                // Determine the values that the current cell can have
+                var range = ranges[(i,j)];
 
                 // If the number is not fixed, set it to the first possible value
                 sudoku.Grid[i, j] = new SudokuItem(range[counter], false);
@@ -72,11 +72,8 @@ public class ChronologicalBackTracking
                                 j--;
                             }
                         }
-                        // Set the counter to the value of the cell we are backtracking to
-                        // This works because of the way the range variable is initialised
-                        // As an example, if we are backtracking to a cell with value 5, then the counter will be set to
-                        // 5, which in the range variable is the index of the number 6, the next number we would try
-                        counter = sudoku.Grid[i, j].Number;
+                        // Set the counter to the subsequent value of the current cell
+                        counter = Array.IndexOf(range, sudoku.Grid[i, j].Number) + 1;
                     }
 
                     // Update the value of the current cell
@@ -108,4 +105,25 @@ public class ChronologicalBackTracking
         var squareSet = new HashSet<int>();
         return squareValues.Where(item => item.Number != 0).All(item => squareSet.Add(item.Number));
     }
+    
+
+    // Generate ranges for empty cells for use in CBT
+    public static Dictionary<(int, int), int[]> GenerateRangesCBT(Sudoku sudoku)
+    {
+        var rangesCBT = new Dictionary<(int, int), int[]>();
+
+        for (var i = 0; i < 9; i++)
+        {
+            for (var j = 0; j < 9; j++)
+            {
+                if (sudoku.Grid[i, j].Number == 0)
+                {
+                    rangesCBT[(i, j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                }
+            }
+        }
+
+        return rangesCBT;
+    }
+
 }

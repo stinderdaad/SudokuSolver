@@ -43,7 +43,8 @@ public class Program
         var sudoku = new Sudoku(numberArray, true);
         Console.WriteLine("Sudoku:");
         sudoku.Print();
-        var solution = ChronologicalBackTracking.CBT(sudoku, 0);
+        var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
+        var solution = ChronologicalBackTracking.CBT(sudoku, ranges, 0);
 
         Console.WriteLine("Solution:");
         solution.Item1.Print();
