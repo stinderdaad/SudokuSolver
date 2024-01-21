@@ -56,7 +56,8 @@ public static class ChronologicalBackTracking
             counter++;
             
             // If we have tried all possible values, we need to backtrack
-            if (counter == 9)
+            range = ranges[(row, col)];
+            if (counter >= range.Length) // i.e. if counter is the last number in the range
             {
                 // Backtracking looks different in each algorithm
                 if (mcv) 
@@ -71,11 +72,11 @@ public static class ChronologicalBackTracking
                 if (row == -1) return (true, -1);
                 
                 // Set the counter to the subsequent value of the current cell
-                counter = Array.IndexOf(range, sudoku.Grid[row, col].Number) + 1;
+                counter = Array.IndexOf(ranges[(row, col)], sudoku.Grid[row, col].Number) + 1;
             }
 
             // Update the value of the current cell
-            sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
+            sudoku.Grid[row, col] = new SudokuItem(ranges[(row, col)][counter], false);
             
             // Remove the new value from the ranges
             if (fc)
@@ -106,9 +107,10 @@ public static class ChronologicalBackTracking
         }
 
         // While backtracking, we should not alter fixed numbers and set values of 9 back to 0
-        while (sudoku.Grid[row, col].IsFixed || sudoku.Grid[row, col].Number == 9)
+        var cell = sudoku.Grid[row, col];
+        while (cell.IsFixed || cell.Number == 9)
         {
-            if (sudoku.Grid[row, col].Number == 9 && !sudoku.Grid[row,col].IsFixed) 
+            if (!cell.IsFixed) 
                 sudoku.Grid[row, col].Number = 0;
             // If we are in the first column, we need to go to the previous row or terminate
             if (col == 0)

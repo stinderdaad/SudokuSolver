@@ -45,12 +45,16 @@ public static class ForwardChecking
         // Update the ranges of the current row
         for (var i = 0; i < 9; i++)
         {
+            if (sudoku.Grid[row, i].IsFixed) continue; // fixed values don't have a range that can be updated
+            if (i == column)continue; // don't remove the value from the cell that it was put in
             UpdateRange(value, row, i, ranges, reAdd);
         }
 
         // Update the ranges of the current column
         for (var i = 0; i < 9; i++)
         {
+            if (sudoku.Grid[i, column].IsFixed) continue; // fixed values don't have a range that can be updated
+            if (i == row) continue; // don't remove the value from the cell that it was put in
             UpdateRange(value, i, column, ranges, reAdd);
         }
 
@@ -61,6 +65,8 @@ public static class ForwardChecking
         {
             for (var j = y; j < y + 3; j++)
             {
+                if (sudoku.Grid[i, j].IsFixed) continue; // fixed values don't have a range that can be updated
+                if (i == row && j == column) continue; // don't remove the value from the cell that it was put in
                 UpdateRange(value, i, j, ranges, reAdd);
             }
         }
@@ -74,7 +80,7 @@ public static class ForwardChecking
             if (list.Contains(value))
             {
                 // Should not be possible
-                System.Console.WriteLine("Error: value already in range");
+                System.Console.WriteLine($"Error: value {value} already in range");
             }
             else
             {
@@ -86,7 +92,7 @@ public static class ForwardChecking
             if (!list.Contains(value)) // deze check is niet nodig voor de Remove() methode, maar misschien handig voor debuggen...
             {
                 // Should not be possible
-                System.Console.WriteLine("Error: value not in range");
+                System.Console.WriteLine($"Error: value {value} not in range");
             }
             else
             {
