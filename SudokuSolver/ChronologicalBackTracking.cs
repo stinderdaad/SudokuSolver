@@ -2,88 +2,128 @@
 
 namespace SudokuSolver;
 
-public class ChronologicalBackTracking
+public static class ChronologicalBackTracking
 {
     // Default Sudoku to return if no solution can be found
-    private static readonly Sudoku ErrorSudoku = new Sudoku(new int[9,9], true);
+    public static readonly Sudoku ErrorSudoku = new Sudoku(new int[9,9], true);
 
     // Solve a Sudoku using the Chronological Backtracking algorithm
-    public static (Sudoku, int) CBT(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount)
+    public static (Sudoku, int) CBT(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount, bool fc = false, bool mcv = false)
     {
         // Traverse the sudoku left-to-right, top-to-bottom
         for (var i = 0; i < 9; i++)
         {
             for (var j = 0; j < 9; j++)
             {
-                var counter = 0;
-
-                // Some numbers in the input are fixed, we should not alter these
-                if (sudoku.Grid[i, j].IsFixed) continue;
-
-                // Determine the values that the current cell can have
-                var range = ranges[(i,j)];
-
-                // If the number is not fixed, set it to the first possible value
-                sudoku.Grid[i, j] = new SudokuItem(range[counter], false);
-                iterationCount++;
-
-                // Determine the square index of the current cell
-                var sIndex = (i / 3) * 3 + (j / 3);
-                
-                // Check if the current sudoku layout is valid
-                while (!Check(sudoku, i, j, sIndex))
-                {
-                    // If it is not valid, we put the next possible value in the cell
-                    counter++;
-                    
-                    // If we have tried all possible values, we need to backtrack
-                    if (counter == 9)
-                    {
-                        // Set the current cell back to 0
-                        sudoku.Grid[i, j] = new SudokuItem(0, false);
-
-                        // If we are in the first column, we need to go to the previous row or terminate
-                        if (j == 0)
-                        {
-                            i--;
-                            // If we reach the start of the sudoku, then no possible solution can be found
-                            if (i == -1) return (ErrorSudoku, -1);
-                            j = 8;
-                        }
-                        else
-                        {
-                            j--;
-                        }
-
-                        // While backtracking, we should not alter fixed numbers and set values of 9 back to 0
-                        while (sudoku.Grid[i, j].IsFixed || sudoku.Grid[i, j].Number == 9)
-                        {
-                            if (sudoku.Grid[i, j].Number == 9 && sudoku.Grid[i,j].IsFixed == false) sudoku.Grid[i, j].Number = 0;
-                            // If we are in the first column, we need to go to the previous row or terminate
-                            if (j == 0)
-                            {
-                                i--;
-                                // If we reach the start of the sudoku, then no possible solution can be found
-                                if (i == -1) return (ErrorSudoku, -1);
-                                j = 8;
-                            }
-                            else
-                            {
-                                j--;
-                            }
-                        }
-                        // Set the counter to the subsequent value of the current cell
-                        counter = Array.IndexOf(range, sudoku.Grid[i, j].Number) + 1;
-                    }
-
-                    // Update the value of the current cell
-                    sudoku.Grid[i, j] = new SudokuItem(range[counter], false);
-                    iterationCount++;
-                }
+                var res = CBTStep(sudoku, ranges, ref iterationCount, ref i, ref j);
+                if (res == (true, -1))
+                    return (ErrorSudoku, -1);
             }
         }
         // Return the solution and the amount of value assignments it took
         return (sudoku, iterationCount);
+    }
+
+    // CBT for one cell of the sudoku, returns true if terminated and 0 with or -1 without solution, and false otherwise
+    // iterationCount is passed by reference so that calling method can keep track of it
+    // row and col are passed by ref so that it is consistent with the for loops in the calling methods of CBT and FC 
+    public static (bool, int) CBTStep(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, ref int iterationCount,
+        ref int row, ref int col, bool fc = false, bool mcv = false, (int, int)[]? array = null)
+    {
+        var counter = 0;
+
+        // Some numbers in the input are fixed, we should not alter these
+        if (sudoku.Grid[row, col].IsFixed) return (false, 0);
+
+        // Determine the values that the current cell can have
+        var range = ranges[(row,col)];
+
+        // If the number is not fixed, set it to the first possible value
+        sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
+        iterationCount++;
+
+        // Determine the square index of the current cell
+        var sIndex = (row / 3) * 3 + (col / 3);
+        
+        if (fc)
+            ForwardChecking.UpdateRangesFC(sudoku, row, col, sIndex, ranges, false);
+        
+        // Check if the current sudoku layout is valid
+        while (!Check(sudoku, row, col, sIndex) || ForwardChecking.IsEmptyRangeSomewhere(ranges)) 
+        {
+            // ReAdd the now unused value to the ranges
+            if (fc)
+                ForwardChecking.UpdateRangesFC(sudoku, row, col, sIndex, ranges, true);
+            
+            // If it is not valid, we put the next possible value in the cell
+            counter++;
+            
+            // If we have tried all possible values, we need to backtrack
+            if (counter == 9)
+            {
+                if (mcv)
+                    (row, col) = ArrayBackTrack(sudoku, row, col, array!);
+                else (row, col) = CBackTrack(sudoku, row, col); 
+                
+                // if we go all the way back to the beginning, return -1 to signal no solution found
+                if (row == -1) return (true, -1);
+                
+                // Set the counter to the subsequent value of the current cell
+                counter = Array.IndexOf(range, sudoku.Grid[row, col].Number) + 1;
+            }
+
+            // Update the value of the current cell
+            sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
+            
+            // Remove the new value from the ranges
+            if (fc)
+                ForwardChecking.UpdateRangesFC(sudoku, row, col, sIndex, ranges, false);
+            
+            iterationCount++;
+        }
+
+        return (true, 0); // succeeded, ready for next cell
+    }
+
+    private static (int, int) CBackTrack(Sudoku sudoku, int row, int col)
+    {
+        // Set the current cell back to 0
+        sudoku.Grid[row, col] = new SudokuItem(0, false);
+
+        // If we are in the first column, we need to go to the previous row or terminate
+        if (col == 0)
+        {
+            row--;
+            // If we reach the start of the sudoku, then no possible solution can be found
+            if (row == -1) return (row, col);
+            col = 8;
+        }
+        else
+        {
+            col--;
+        }
+
+        // While backtracking, we should not alter fixed numbers and set values of 9 back to 0
+        while (sudoku.Grid[row, col].IsFixed || sudoku.Grid[row, col].Number == 9)
+        {
+            if (sudoku.Grid[row, col].Number == 9 && !sudoku.Grid[row,col].IsFixed) 
+                sudoku.Grid[row, col].Number = 0;
+            // If we are in the first column, we need to go to the previous row or terminate
+            if (col == 0)
+            {
+                row--;
+                // If we reach the start of the sudoku, then no possible solution can be found
+                if (row == -1) return (row, col);
+                col = 8;
+            }
+            else
+            {
+                col--;
+            }
+        }
+
+        return (row, col);
+    }
     }
     
     // Function to check that the current sudoku layout is valid, given a row, column, and square index
@@ -106,6 +146,7 @@ public class ChronologicalBackTracking
         return squareValues.Where(item => item.Number != 0).All(item => squareSet.Add(item.Number));
     }
     
+    
 
     // Generate ranges for empty cells for use in CBT
     public static Dictionary<(int, int), int[]> GenerateRangesCBT(Sudoku sudoku)
@@ -125,5 +166,4 @@ public class ChronologicalBackTracking
 
         return rangesCBT;
     }
-
 }
