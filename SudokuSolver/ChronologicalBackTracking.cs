@@ -41,19 +41,16 @@ public static class ChronologicalBackTracking
         // If the number is not fixed, set it to the first possible value
         sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
         iterationCount++;
-
-        // Determine the square index of the current cell
-        var sIndex = (row / 3) * 3 + (col / 3);
         
         if (fc)
-            ForwardChecking.UpdateRangesFC(sudoku, row, col, sIndex, ranges, false);
+            ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, false);
         
         // Check if the current sudoku layout is valid
-        while (!Check(sudoku, row, col, sIndex) || ForwardChecking.IsEmptyRangeSomewhere(ranges)) 
+            while (!Check(sudoku, row, col) || ForwardChecking.IsEmptyRangeSomewhere(ranges)) 
         {
             // ReAdd the now unused value to the ranges
             if (fc)
-                ForwardChecking.UpdateRangesFC(sudoku, row, col, sIndex, ranges, true);
+                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
             
             // If it is not valid, we put the next possible value in the cell
             counter++;
@@ -77,7 +74,7 @@ public static class ChronologicalBackTracking
             
             // Remove the new value from the ranges
             if (fc)
-                ForwardChecking.UpdateRangesFC(sudoku, row, col, sIndex, ranges, false);
+                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, false);
             
             iterationCount++;
         }
@@ -136,8 +133,10 @@ public static class ChronologicalBackTracking
     }
     
     // Function to check that the current sudoku layout is valid, given a row, column, and square index
-    private static bool Check(Sudoku sudoku, int row, int column, int square)
+    private static bool Check(Sudoku sudoku, int row, int column)
     {
+        // Determine the square index of the current cell
+        var square = (row / 3) * 3 + (column / 3);
         // Get the values of the row, column and square
         var rowValues = sudoku.GetRow(row);
         var columnValues = sudoku.GetColumn(column);

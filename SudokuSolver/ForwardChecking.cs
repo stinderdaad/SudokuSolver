@@ -16,9 +16,7 @@ public static class ForwardChecking
             {
                 if (!sudoku.Grid[i, j].IsFixed) continue;
 
-                // Determine the square index of the current cell
-                var sIndex = (i / 3) * 3 + (j / 3);
-                UpdateRangesFC(sudoku, i, j, sIndex, ranges, false);
+                UpdateRangesFC(sudoku, i, j, ranges, false);
             }
         }
 
@@ -36,11 +34,13 @@ public static class ForwardChecking
         return (sudoku, iterationCount);
     }
 
-    public static void UpdateRangesFC(Sudoku sudoku, int row, int column, int square,
+    public static void UpdateRangesFC(Sudoku sudoku, int row, int column,
         Dictionary<(int, int), int[]> ranges, bool reAdd)
     {
         // The value that needs to be deleted from the ranges
         var value = sudoku.Grid[row, column].Number;
+        // Determine the square index of the current cell
+        var square = (row / 3) * 3 + (column / 3);
 
         // Update the ranges of the current row
         for (var i = 0; i < 9; i++)
@@ -116,9 +116,7 @@ public static class ForwardChecking
             {
                 if (!sudoku.Grid[i, j].IsFixed) continue;
 
-                // Determine the square index of the current cell
-                var sIndex = (i / 3) * 3 + (j / 3);
-                UpdateRangesFC(sudoku, i, j, sIndex, ranges, false);
+                UpdateRangesFC(sudoku, i, j, ranges, false);
             }
         }
 
