@@ -124,6 +124,15 @@ public static class ChronologicalBackTracking
 
         return (row, col);
     }
+
+    private static (int, int) ArrayBackTrack(Sudoku sudoku, int row, int col, (int, int)[] array)
+    {
+        // Set the current cell back to 0
+        sudoku.Grid[row, col] = new SudokuItem(0, false);
+        
+        // get index of current cell in array of cells being iterated through
+        var index = Array.IndexOf(array, (row, col));
+        return index < 1 ? (-1, 0) : array[(index - 1)]; // if index < 1 then back at the beginning, so return row -1 to indicate this
     }
     
     // Function to check that the current sudoku layout is valid, given a row, column, and square index
