@@ -58,8 +58,13 @@ public static class ChronologicalBackTracking
             // If we have tried all possible values, we need to backtrack
             if (counter == 9)
             {
-                if (mcv)
+                // Backtracking looks different in each algorithm
+                if (mcv) 
                     (row, col) = ArrayBackTrack(sudoku, row, col, array!);
+                
+                else if (fc)
+                    (row, col) = FCBackTrack(sudoku, ranges, row, col);
+                
                 else (row, col) = CBackTrack(sudoku, row, col); 
                 
                 // if we go all the way back to the beginning, return -1 to signal no solution found
@@ -117,6 +122,59 @@ public static class ChronologicalBackTracking
             {
                 col--;
             }
+        }
+
+        return (row, col);
+    }
+
+    private static (int, int) FCBackTrack(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int row, int col)
+    {
+        // Set the current cell back to 0
+        sudoku.Grid[row, col] = new SudokuItem(0, false);
+
+        // If we are in the first column, we need to go to the previous row or terminate
+        if (col == 0)
+        {
+            row--;
+            // If we reach the start of the sudoku, then no possible solution can be found
+            if (row == -1) return (row, col);
+            col = 8;
+        }
+        else
+        {
+            col--;
+        }
+
+        // While backtracking, we should not alter fixed numbers and set values back to 0 if no options are left
+        var cell = sudoku.Grid[row, col];
+        var range = Array.Empty<int>();
+        if (!cell.IsFixed)
+            range = ranges[(row, col)];
+        while (cell.IsFixed || Array.IndexOf(range, cell.Number) + 1 == range.Length)
+        {
+            if (!cell.IsFixed)
+            {
+                // Re-add the now unused value to the ranges
+                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
+                sudoku.Grid[row, col].Number = 0;
+            }
+            
+            // If we are in the first column, we need to go to the previous row or terminate
+            if (col == 0)
+            {
+                row--;
+                // If we reach the start of the sudoku, then no possible solution can be found
+                if (row == -1) return (row, col);
+                col = 8;
+            }
+            else
+            {
+                col--;
+            }
+            
+            cell = sudoku.Grid[row, col];
+            if (!cell.IsFixed)
+                range = ranges[(row, col)];
         }
 
         return (row, col);
