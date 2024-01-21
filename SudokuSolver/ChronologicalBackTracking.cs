@@ -75,6 +75,10 @@ public static class ChronologicalBackTracking
                 counter = Array.IndexOf(ranges[(row, col)], sudoku.Grid[row, col].Number) + 1;
             }
 
+            // ReAdd the now unused value to the ranges
+            if (fc)
+                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
+            
             // Update the value of the current cell
             sudoku.Grid[row, col] = new SudokuItem(ranges[(row, col)][counter], false);
             
