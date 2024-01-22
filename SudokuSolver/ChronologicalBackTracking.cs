@@ -72,7 +72,8 @@ public static class ChronologicalBackTracking
                 if (row == -1) return (true, -1);
                 
                 // Set the counter to the subsequent value of the current cell
-                counter = Array.IndexOf(ranges[(row, col)], sudoku.Grid[row, col].Number) + 1;
+                //counter = Array.IndexOf(ranges[(row, col)], sudoku.Grid[row, col].Number) + 1;
+                counter = Array.IndexOf(range, sudoku.Grid[row, col].Number) + 1;
             }
 
             // ReAdd the now unused value to the ranges
@@ -80,7 +81,8 @@ public static class ChronologicalBackTracking
                 ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
             
             // Update the value of the current cell
-            sudoku.Grid[row, col] = new SudokuItem(ranges[(row, col)][counter], false);
+            //sudoku.Grid[row, col] = new SudokuItem(ranges[(row, col)][counter], false);
+            sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
             
             // Remove the new value from the ranges
             if (fc)
@@ -114,7 +116,9 @@ public static class ChronologicalBackTracking
         var cell = sudoku.Grid[row, col];
         while (cell.IsFixed || cell.Number == 9)
         {
-            if (!cell.IsFixed) 
+            //if (!cell.IsFixed) 
+            //    sudoku.Grid[row, col].Number = 0;
+            if (cell is { Number: 9, IsFixed: false })
                 sudoku.Grid[row, col].Number = 0;
             // If we are in the first column, we need to go to the previous row or terminate
             if (col == 0)
@@ -128,6 +132,7 @@ public static class ChronologicalBackTracking
             {
                 col--;
             }
+            cell = sudoku.Grid[row, col];
         }
 
         return (row, col);
