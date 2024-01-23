@@ -134,7 +134,7 @@ public static class ForwardChecking
             var row = cell.Item1;
             var col = cell.Item2;
             
-            var res = CBTStep(sudoku, ranges, ref iterationCount, ref row, ref col, true, true);
+            var res = CBTStep(sudoku, ranges, ref iterationCount, ref row, ref col, true, true, mcvArray);
             if (res == (true, -1))
                 return (ChronologicalBackTracking.ErrorSudoku, -1);
         }

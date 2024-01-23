@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.Design;
-
-namespace SudokuSolver;
+﻿namespace SudokuSolver;
 
 public static class ChronologicalBackTracking
 {
@@ -61,7 +59,7 @@ public static class ChronologicalBackTracking
             {
                 // Backtracking looks different in each algorithm
                 if (mcv) 
-                    (row, col) = ArrayBackTrack(sudoku, row, col, array!);
+                    (row, col) = ArrayBackTrack(sudoku, ranges, row, col, array!);
                 
                 else if (fc)
                     (row, col) = FCBackTrack(sudoku, ranges, row, col);
@@ -191,14 +189,51 @@ public static class ChronologicalBackTracking
         return (row, col);
     }
 
-    private static (int, int) ArrayBackTrack(Sudoku sudoku, int row, int col, (int, int)[] array)
+    private static (int, int) ArrayBackTrack(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int row, int col, (int, int)[] array)
     {
         // Set the current cell back to 0
         sudoku.Grid[row, col] = new SudokuItem(0, false);
         
         // get index of current cell in array of cells being iterated through
         var index = Array.IndexOf(array, (row, col));
-        return index < 1 ? (-1, 0) : array[(index - 1)]; // if index < 1 then back at the beginning, so return row -1 to indicate this
+        
+        // if index < 1 then back at the beginning, so return row -1 to indicate this
+        if (index < 1)
+            return (-1, 0);
+        
+        // previous cell
+        (row, col) = array[(index - 1)]; 
+        
+        // While backtracking, we should not alter fixed numbers and set values back to 0 if no options are left
+        var cell = sudoku.Grid[row, col];
+        var range = Array.Empty<int>();
+        if (!cell.IsFixed)
+            range = ranges[(row, col)];
+        while (cell.IsFixed || Array.IndexOf(range, cell.Number) + 1 == range.Length)
+        {
+            if (!cell.IsFixed)
+            {
+                // Re-add the now unused value to the ranges
+                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
+                sudoku.Grid[row, col].Number = 0;
+            }
+            
+            // get index of current cell in array of cells being iterated through
+            index = Array.IndexOf(array, (row, col));
+        
+            // if index < 1 then back at the beginning, so return row -1 to indicate this
+            if (index < 1)
+                return (-1, 0);
+            
+            // previous cell
+            (row, col) = array[(index - 1)]; 
+            
+            cell = sudoku.Grid[row, col];
+            if (!cell.IsFixed)
+                range = ranges[(row, col)];
+        }
+
+        return (row, col);
     }
     
     // Function to check that the current sudoku layout is valid, given a row, column, and square index
