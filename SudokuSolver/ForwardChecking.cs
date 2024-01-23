@@ -126,25 +126,31 @@ public static class ForwardChecking
             }
         }
 
-        // Traverse the sudoku mcv-wise
-        var mcvArray = MCVRange(ranges);
-        foreach (var cell in mcvArray)
+        while (ContainsZeros(sudoku))
         {
-            // arbitrary assigments so that row and col can be passed by reference as required in CBTStep()
-            var row = cell.Item1;
-            var col = cell.Item2;
-            
+            // Sort the sudoku mcv-wise
+            var mcvArray = MCVRange(sudoku, ranges);
+            // get most constrained cell 
+            var (row, col) = mcvArray[0];
+
             var res = CBTStep(sudoku, ranges, ref iterationCount, ref row, ref col, true, true, mcvArray);
             if (res == (true, -1))
-                return (ChronologicalBackTracking.ErrorSudoku, -1);
+                return (ErrorSudoku, -1);
         }
+        
         // Return the solution and the amount of value assignments it took
         return (sudoku, iterationCount);
     }
-    
-    // returns an array with the keys sorted in ascending order of domain size (most-constrained-variable)
-    private static (int, int)[] MCVRange(Dictionary<(int, int), int[]> ranges)
+
+    private static bool ContainsZeros(Sudoku sudoku)
     {
-        return ranges.Keys.OrderBy(key => ranges[key].Length).ToArray();
+        return sudoku.Grid.Cast<SudokuItem>().Any(cell => cell.Number == 0);
+    }
+    
+    // returns an array with the keys for empty cell, sorted in ascending order of domain size (most-constrained-variable)
+    private static (int, int)[] MCVRange(Sudoku sudoku, Dictionary<(int, int), int[]> ranges)
+    {
+        return ranges.Keys.Where(key => sudoku.Grid[key.Item1, key.Item2].Number == 0)
+            .OrderBy(key => ranges[key].Length).ToArray();
     }
 }
