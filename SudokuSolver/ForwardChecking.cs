@@ -6,19 +6,27 @@ using static ChronologicalBackTracking;
 
 public static class ForwardChecking
 {
-    // Solve a Sudoku using the Chronological Backtracking algorithm
-    public static (Sudoku, int) FC(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount)
+    public static Dictionary<(int, int), int[]> MakeConsistent(Sudoku sudoku, Dictionary<(int, int), int[]> ranges)
     {
-        // First remove all fixed values from the ranges
+        ranges = GenerateRangesCBT(sudoku, ranges);
         for (var i = 0; i < 9; i++)
         {
             for (var j = 0; j < 9; j++)
             {
-                if (!sudoku.Grid[i, j].IsFixed) continue;
+                if (sudoku.Grid[i,j].Number == 0) continue;
 
-                UpdateRangesFC(sudoku, i, j, ranges, false);
+                UpdateRangesFC(sudoku, i, j, ranges);
             }
         }
+
+        return ranges;
+    }
+    
+    // Solve a Sudoku using the Chronological Backtracking algorithm
+    public static (Sudoku, int) FC(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount)
+    {
+        // First remove all fixed values from the ranges
+        ranges = MakeConsistent(sudoku, ranges);
 
         // Traverse the sudoku left-to-right, top-to-bottoms
         for (var i = 0; i < 9; i++)
@@ -35,7 +43,7 @@ public static class ForwardChecking
     }
 
     public static void UpdateRangesFC(Sudoku sudoku, int row, int column,
-        Dictionary<(int, int), int[]> ranges, bool reAdd)
+        Dictionary<(int, int), int[]> ranges)
     {
         // The value that needs to be deleted from the ranges
         var value = sudoku.Grid[row, column].Number;
@@ -45,17 +53,17 @@ public static class ForwardChecking
         // Update the ranges of the current row
         for (var i = 0; i < 9; i++)
         {
-            if (sudoku.Grid[row, i].IsFixed) continue; // fixed values don't have a range that can be updated
-            if (i == column)continue; // don't remove the value from the cell that it was put in
-            UpdateRange(value, row, i, ranges, reAdd);
+            if (sudoku.Grid[row, i].IsFixed || sudoku.Grid[row, i].Number != 0) continue; // fixed values don't have a range that can be updated
+            if (i == column) continue; // don't remove the value from the cell that it was put in
+            UpdateRange(value, row, i, ranges);
         }
 
         // Update the ranges of the current column
         for (var i = 0; i < 9; i++)
         {
-            if (sudoku.Grid[i, column].IsFixed) continue; // fixed values don't have a range that can be updated
+            if (sudoku.Grid[i, column].IsFixed || sudoku.Grid[i, column].Number != 0) continue; // fixed values don't have a range that can be updated
             if (i == row) continue; // don't remove the value from the cell that it was put in
-            UpdateRange(value, i, column, ranges, reAdd);
+            UpdateRange(value, i, column, ranges);
         }
 
         // Update the ranges of the current square
@@ -63,47 +71,22 @@ public static class ForwardChecking
         var y = (square % 3) * 3;
         for (var i = x; i < x + 3; i++)
         {
+            if (i == row) continue;
             for (var j = y; j < y + 3; j++)
             {
-                if (sudoku.Grid[i, j].IsFixed) continue; // fixed values don't have a range that can be updated
+                if (j == column) continue;
+                if (sudoku.Grid[i, j].IsFixed || sudoku.Grid[i, j].Number != 0) continue; // fixed values don't have a range that can be updated
                 if (i == row && j == column) continue; // don't remove the value from the cell that it was put in
-                UpdateRange(value, i, j, ranges, reAdd);
+                UpdateRange(value, i, j, ranges);
             }
         }
     }
 
-    private static void UpdateRange(int value, int row, int column, Dictionary<(int, int), int[]> ranges, bool reAdd)
+    private static void UpdateRange(int value, int row, int column, Dictionary<(int, int), int[]> ranges)
     {
-        var list = ranges[(row, column)].ToList();
-        if (reAdd)
-        {
-            if (list.Contains(value))
-            {
-                // Should not be possible
-                System.Console.WriteLine($"Error: value {value} already in range");
-            }
-            else
-            {
-                list.Add(value);
-                list.Sort();
-            }
-        }
-        else {
-            if (!list.Contains(value)) // deze check is niet nodig voor de Remove() methode, maar misschien handig voor debuggen...
-            {
-                // Should not be possible
-                System.Console.WriteLine($"Error: value {value} not in range");
-            }
-            else
-            {
-                list.Remove(value);
-            }
-        }
-        ranges[(row, column)] = list.ToArray();
+        ranges[(row, column)] = ranges[(row, column)].Where(e => e != value).ToArray();
     }
-
-    // TODO: gaat dit nog goed met al ingevulde vakjes? of krijg je situaties waar een vakje met het correcte getal een
-    // lege range heeft en daardoor backtracking veroorzaakt?
+    
     public static bool IsEmptyRangeSomewhere(Dictionary<(int, int), int[]> ranges)
     {
         foreach (var range in ranges)
@@ -116,15 +99,7 @@ public static class ForwardChecking
     public static (Sudoku, int) MCV(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount)
     {
         // First remove all fixed values from the ranges
-        for (var i = 0; i < 9; i++)
-        {
-            for (var j = 0; j < 9; j++)
-            {
-                if (!sudoku.Grid[i, j].IsFixed) continue;
-
-                UpdateRangesFC(sudoku, i, j, ranges, false);
-            }
-        }
+        ranges = MakeConsistent(sudoku, ranges);
 
         while (ContainsZeros(sudoku))
         {

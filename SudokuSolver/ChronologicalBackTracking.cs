@@ -39,17 +39,13 @@ public static class ChronologicalBackTracking
         // If the number is not fixed, set it to the first possible value
         sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
         iterationCount++;
-        
+
         if (fc)
-            ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, false);
-        
+            ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges);
+            
         // Check if the current sudoku layout is valid
             while (!Check(sudoku, row, col) || ForwardChecking.IsEmptyRangeSomewhere(ranges)) 
         {
-            // ReAdd the now unused value to the ranges
-            if (fc)
-                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
-            
             // If it is not valid, we put the next possible value in the cell
             counter++;
             
@@ -75,14 +71,13 @@ public static class ChronologicalBackTracking
                 else counter = Array.IndexOf(range, sudoku.Grid[row, col].Number) + 1;
             }
 
-            // ReAdd the now unused value to the ranges
             if (fc)
             {
-                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
                 // Update the value of the current cell
                 sudoku.Grid[row, col] = new SudokuItem(ranges[(row, col)][counter], false);
+                
                 // Remove the new value from the ranges
-                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, false);
+                ranges = ForwardChecking.MakeConsistent(sudoku, ranges);
             }
             else 
                 sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
@@ -138,8 +133,11 @@ public static class ChronologicalBackTracking
 
     private static (int, int) FCBackTrack(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int row, int col)
     {
+        // ReAdd the now unused value to the ranges
+        ranges = ForwardChecking.MakeConsistent(sudoku, ranges);
         // Set the current cell back to 0
         sudoku.Grid[row, col] = new SudokuItem(0, false);
+        
 
         // If we are in the first column, we need to go to the previous row or terminate
         if (col == 0)
@@ -164,7 +162,7 @@ public static class ChronologicalBackTracking
             if (!cell.IsFixed)
             {
                 // Re-add the now unused value to the ranges
-                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
+                ranges = ForwardChecking.MakeConsistent(sudoku, ranges);
                 sudoku.Grid[row, col].Number = 0;
             }
             
@@ -214,7 +212,7 @@ public static class ChronologicalBackTracking
             if (!cell.IsFixed)
             {
                 // Re-add the now unused value to the ranges
-                ForwardChecking.UpdateRangesFC(sudoku, row, col, ranges, true);
+                ranges = ForwardChecking.MakeConsistent(sudoku, ranges);
                 sudoku.Grid[row, col].Number = 0;
             }
             
@@ -261,7 +259,7 @@ public static class ChronologicalBackTracking
     
 
     // Generate ranges for empty cells for use in CBT
-    public static Dictionary<(int, int), int[]> GenerateRangesCBT(Sudoku sudoku)
+    public static Dictionary<(int, int), int[]> GenerateRangesCBT(Sudoku sudoku, Dictionary<(int, int), int[]> ranges)
     {
         var rangesCBT = new Dictionary<(int, int), int[]>();
 
@@ -269,13 +267,13 @@ public static class ChronologicalBackTracking
         {
             for (var j = 0; j < 9; j++)
             {
-                if (sudoku.Grid[i, j].Number == 0)
+                if (!sudoku.Grid[i, j].IsFixed)
                 {
-                    rangesCBT[(i, j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                    ranges[(i, j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                 }
             }
         }
 
-        return rangesCBT;
+        return ranges;
     }
 }
