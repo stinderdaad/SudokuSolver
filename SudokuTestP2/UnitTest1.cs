@@ -21,8 +21,9 @@ public class Tests
     public void Setup()
     {
     }
-
-    public bool CheckValidSudoku(Sudoku sudoku)
+    
+    // Check that a given sudoku has a valid layout
+    private static bool CheckValidSudoku(Sudoku sudoku)
     {
         for(var i=0; i<9; i++)
         {
@@ -47,9 +48,10 @@ public class Tests
     }
 
     [Test]
+    // Check that 2 identical sudokus are equal to each other according to the program/data structure
     public void TwoSudokusSame()
     {
-        var validSudoku = new int[9, 9]
+        var validSudoku = new[,]
         {
             {5, 3, 0, 0, 7, 0, 0, 0, 0},
             {6, 0, 0, 1, 9, 5, 0, 0, 0},
@@ -67,7 +69,7 @@ public class Tests
     }
 
     [Test]
-    // Check that, if the input is a already valid sudoku, then the algorithm does not perform any iterations
+    // Check that, if the input is a already valid sudoku, then the algorithms do not perform any iterations
     public void CheckCorrectSolution()
     {
         const string validSudokuString = "5 3 4 6 7 8 9 1 2 " +
@@ -81,9 +83,20 @@ public class Tests
                                          "3 4 5 2 8 6 1 7 9";
 
         var sudoku = new Sudoku(SudokuSolver.PopulateArray(validSudokuString.Split(' ')), true);
-        var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
-        var solution = ChronologicalBackTracking.CBT(sudoku, ranges, 0);
-        Assert.That(solution.Item2, Is.EqualTo(0));
+        var ranges = new Dictionary<(int, int), int[]>();
+        var rangesCBT = ChronologicalBackTracking.GenerateRangesCBT(sudoku, ranges);        
+        var solution = ChronologicalBackTracking.CBT(sudoku, rangesCBT, 0);
+        var solution2 = ForwardChecking.FC(sudoku, ranges, 0);
+        var solution3 = ForwardChecking.MCV(sudoku, ranges, 0);
+        Assert.Multiple(() =>
+        {
+            Assert.That(solution.Item2, Is.EqualTo(0));
+            Assert.That(CheckValidSudoku(solution.Item1));
+            Assert.That(solution2.Item2, Is.EqualTo(0));
+            Assert.That(CheckValidSudoku(solution2.Item1));
+            Assert.That(solution3.Item2, Is.EqualTo(0));
+            Assert.That(CheckValidSudoku(solution3.Item1));
+        });     
     }
 
     [Test]
@@ -93,7 +106,8 @@ public class Tests
         foreach (var input in _sampleInputs)
         {
             var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
-            var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
+            var ranges = new Dictionary<(int, int), int[]>();
+            ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku, ranges);
             var solution = ChronologicalBackTracking.CBT(sudoku, ranges, 0);
             Assert.Multiple(() =>
             {
@@ -113,7 +127,8 @@ public class Tests
             for (var i = 0; i < runs; i++)
             {
                 var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
-                var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
+                var ranges = new Dictionary<(int, int), int[]>();
+                ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku, ranges);
                 var solution = ChronologicalBackTracking.CBT(sudoku, ranges, 0);
                 Assert.Multiple(() =>
                 {
@@ -132,7 +147,7 @@ public class Tests
         foreach (var input in _sampleInputs)
         {
             var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
-            var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
+            var ranges = new Dictionary<(int, int), int[]>();
             var solution = ForwardChecking.FC(sudoku, ranges, 0);
             Assert.Multiple(() =>
             {
@@ -142,7 +157,7 @@ public class Tests
         }
     }
     [Test]
-    // Determine avg amount of iterations for CBT to solve each of the 5 sample inputs
+    // Determine avg amount of iterations for FC to solve each of the 5 sample inputs
     public void FCAvgIt()
     {
         const int runs = 5;
@@ -151,7 +166,7 @@ public class Tests
             for (var i = 0; i < runs; i++)
             {
                 var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
-                var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
+                var ranges = new Dictionary<(int, int), int[]>();
                 var solution = ForwardChecking.FC(sudoku, ranges, 0);
                 Assert.Multiple(() =>
                 {
@@ -170,7 +185,7 @@ public class Tests
         foreach (var input in _sampleInputs)
         {
             var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
-            var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
+            var ranges = new Dictionary<(int, int), int[]>();
             var solution = ForwardChecking.MCV(sudoku, ranges, 0);
             Assert.Multiple(() =>
             {
@@ -180,7 +195,7 @@ public class Tests
         }
     }
     [Test]
-    // Determine avg amount of iterations for CBT to solve each of the 5 sample inputs
+    // Determine avg amount of iterations for FC with MCB to solve each of the 5 sample inputs
     public void MCVAvgIt()
     {
         const int runs = 5;
@@ -189,7 +204,7 @@ public class Tests
             for (var i = 0; i < runs; i++)
             {
                 var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
-                var ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku);
+                var ranges = new Dictionary<(int, int), int[]>();
                 var solution = ForwardChecking.MCV(sudoku, ranges, 0);
                 Assert.Multiple(() =>
                 {
