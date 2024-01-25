@@ -6,7 +6,7 @@ using static ChronologicalBackTracking;
 
 public static class ForwardChecking
 {
-    public static Dictionary<(int, int), int[]> MakeConsistent(Sudoku sudoku, Dictionary<(int, int), int[]> ranges)
+    public static void MakeConsistent(Sudoku sudoku, Dictionary<(int, int), int[]> ranges)
     {
         ranges = GenerateRangesCBT(sudoku, ranges);
         for (var i = 0; i < 9; i++)
@@ -18,15 +18,13 @@ public static class ForwardChecking
                 UpdateRangesFC(sudoku, i, j, ranges);
             }
         }
-
-        return ranges;
     }
     
     // Solve a Sudoku using the Chronological Backtracking algorithm
     public static (Sudoku, int) FC(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount)
     {
         // First remove all fixed values from the ranges
-        ranges = MakeConsistent(sudoku, ranges);
+        MakeConsistent(sudoku, ranges);
 
         // Traverse the sudoku left-to-right, top-to-bottoms
         for (var i = 0; i < 9; i++)
@@ -76,7 +74,6 @@ public static class ForwardChecking
             {
                 if (j == column) continue;
                 if (sudoku.Grid[i, j].IsFixed || sudoku.Grid[i, j].Number != 0) continue; // fixed values don't have a range that can be updated
-                if (i == row && j == column) continue; // don't remove the value from the cell that it was put in
                 UpdateRange(value, i, j, ranges);
             }
         }
@@ -99,33 +96,98 @@ public static class ForwardChecking
     public static (Sudoku, int) MCV(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int iterationCount)
     {
         // First remove all fixed values from the ranges
-        ranges = MakeConsistent(sudoku, ranges);
+        MakeConsistent(sudoku, ranges);
 
-        while (ContainsZeros(sudoku))
+        // initial array
+        var mcvArray = MCVRange(ranges, ranges.Keys.ToArray(), 0);
+        
+        for (var i = 0; i < mcvArray.Length; i++)
         {
             // Sort the sudoku mcv-wise
-            var mcvArray = MCVRange(sudoku, ranges);
-            // get most constrained cell 
-            var (row, col) = mcvArray[0];
-
-            var res = CBTStep(sudoku, ranges, ref iterationCount, ref row, ref col, true, true, mcvArray);
+            mcvArray = MCVRange(ranges, mcvArray, i);
+            var res = MCVStep(sudoku, ranges, ref iterationCount, i, mcvArray);
             if (res == (true, -1))
                 return (ErrorSudoku, -1);
+            i = res.Item2;
         }
         
         // Return the solution and the amount of value assignments it took
         return (sudoku, iterationCount);
     }
-
-    private static bool ContainsZeros(Sudoku sudoku)
+    
+    private static (bool, int) MCVStep(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, ref int iterationCount,
+        int index, (int, int)[] array)
     {
-        return sudoku.Grid.Cast<SudokuItem>().Any(cell => cell.Number == 0);
+        var (row, col) = array[index];
+        var counter = 0;
+        // if we're backtracking, go to the next number
+        if (sudoku.Grid[row, col].Number != 0)
+            counter = Array.IndexOf(ranges[(row, col)], sudoku.Grid[row, col].Number) + 1;
+
+        // Determine the values that the current cell can have
+        var range = ranges[(row,col)];
+
+        // set it to the next possible value
+        sudoku.Grid[row, col] = new SudokuItem(range[counter], false);
+        iterationCount++;
+
+        UpdateRangesFC(sudoku, row, col, ranges);
+        var res = index;
+        // Check if the current sudoku layout is valid and if any range is empty
+        if (IsEmptyRangeSomewhere(ranges))
+        {
+            res = ArrayBackTrack(sudoku, ranges, index, array, counter, ref iterationCount);
+            if (res == -1)
+                return (true, -1);
+            
+        }
+
+        return (true, res); // succeeded, ready for next cell
+    }
+    
+    private static int ArrayBackTrack(Sudoku sudoku, Dictionary<(int, int), int[]> ranges, int index, (int, int)[] array, int counter, ref int iterationCount)
+    {
+        var (row, col) = array[index];
+        var range = ranges[(row, col)];
+        // If it is not valid, we put the next possible value in the cell
+        counter++;
+            
+        // If we have tried all possible values, we need to go to previous index
+        if (counter >= range.Length) // i.e. if counter is the last number in the range
+        {
+            // Set the current cell back to 0
+            sudoku.Grid[row, col] = new SudokuItem(0, false);
+        
+            // if index < 1 then back at the beginning, so return row -1 to indicate this
+            if (index < 1)
+                return -1;
+        
+            // previous cell
+            var newIndex = index - 1;
+            (row, col) = array[newIndex];
+            counter = Array.IndexOf(ranges[(row, col)], sudoku.Grid[row, col].Number);
+            var v = ArrayBackTrack(sudoku, ranges, newIndex, array, counter, ref iterationCount);
+
+            if (v == -1)
+                return -1;
+            return v;
+        }
+        
+        // Update the value of the current cell
+        sudoku.Grid[row, col] = new SudokuItem(ranges[(row, col)][counter], false);
+            
+        // Remove the new value from the ranges
+        MakeConsistent(sudoku, ranges);
+            
+        iterationCount++;
+        return index;
     }
     
     // returns an array with the keys for empty cell, sorted in ascending order of domain size (most-constrained-variable)
-    private static (int, int)[] MCVRange(Sudoku sudoku, Dictionary<(int, int), int[]> ranges)
+    private static (int, int)[] MCVRange(Dictionary<(int, int), int[]> ranges, (int, int)[] array, int skip = 0)
     {
-        return ranges.Keys.Where(key => sudoku.Grid[key.Item1, key.Item2].Number == 0)
-            .OrderBy(key => ranges[key].Length).ToArray();
+        return array.Take(skip).Concat(
+                array.Skip(skip).OrderBy(key => ranges[key].Length)
+                ).ToArray();
     }
 }
