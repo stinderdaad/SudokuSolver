@@ -214,7 +214,7 @@ public class Sudoku
     }
 
     // Pretty print a Sudoku grid
-    public void Print()
+    public void Print(int row=9, int col=9)
     {
         Console.WriteLine("-------------------------------");
         for (var i = 0; i < 9; i++)
@@ -228,6 +228,8 @@ public class Sudoku
                 // Fixed numbers are colored red
                 if (Grid[i, j].IsFixed)
                     Console.ForegroundColor = ConsoleColor.Red;
+                if (i == row && j == col)
+                    Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write(" " + Grid[i, j].Number + " ");
                 Console.ResetColor();
             }
