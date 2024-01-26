@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace SudokuTestP2;
 
 using NUnit.Framework;
@@ -139,6 +141,27 @@ public class Tests
             }
         }
     }
+    [Test]
+    // Determine the avg amount of time for CBT to solve each of the 5 sample inputs over 100 runs
+    public void CBTAvgTime()
+    {
+        foreach (var input in _sampleInputs)
+        {
+            var times = new List<double>();
+            for (var i = 0; i < 100; i++)
+            {
+                var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
+                var sw = new Stopwatch();
+                sw.Start();
+                var ranges = new Dictionary<(int, int), int[]>();
+                ranges = ChronologicalBackTracking.GenerateRangesCBT(sudoku, ranges);
+                var solution = ChronologicalBackTracking.CBT(sudoku, ranges, 0);
+                sw.Stop();
+                times.Add(sw.Elapsed.TotalMilliseconds);
+            }
+            Console.WriteLine("Average time of 100 runs: " + times.Average() + "ms.");
+        }
+    }
     
     [Test]
     // Check that FC can solve each of the 5 sample inputs
@@ -177,6 +200,26 @@ public class Tests
             }
         }
     }
+    [Test]
+    // Determine the avg amount of time for FC to solve each of the 5 sample inputs over 100 runs
+    public void FCAvgTime()
+    {
+        foreach (var input in _sampleInputs)
+        {
+            var times = new List<double>();
+            for (var i = 0; i < 100; i++)
+            {
+                var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
+                var sw = new Stopwatch();
+                sw.Start();
+                var ranges = new Dictionary<(int, int), int[]>();
+                var solution = ForwardChecking.FC(sudoku, ranges, 0);
+                sw.Stop();
+                times.Add(sw.Elapsed.TotalMilliseconds);
+            }
+            Console.WriteLine("Average time of 100 runs: " + times.Average() + "ms.");
+        }
+    }
     
     [Test]
     // Check that FC with MCV can solve each of the 5 sample inputs
@@ -213,6 +256,26 @@ public class Tests
                 });
                 Console.WriteLine("Run " + i + " took " + solution.Item2 + " iterations");
             }
+        }
+    }
+    [Test]
+    // Determine the avg amount of time for FC to solve each of the 5 sample inputs over 100 runs
+    public void MCVAvgTime()
+    {
+        foreach (var input in _sampleInputs)
+        {
+            var times = new List<double>();
+            for (var i = 0; i < 100; i++)
+            {
+                var sudoku = new Sudoku(SudokuSolver.PopulateArray(input.Split(' ')), true);
+                var sw = new Stopwatch();
+                sw.Start();
+                var ranges = new Dictionary<(int, int), int[]>();
+                var solution = ForwardChecking.MCV(sudoku, ranges, 0);
+                sw.Stop();
+                times.Add(sw.Elapsed.TotalMilliseconds);
+            }
+            Console.WriteLine("Average time of 100 runs: " + times.Average() + "ms.");
         }
     }
 }
